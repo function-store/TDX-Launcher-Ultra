@@ -1911,10 +1911,17 @@ export default function App() {
    */
   const enterCliMode = useCallback(async (cli: string) => {
     setCliMode(true);
+    // Only when a switch is coming: on Recent already, nothing would clear it.
+    selectionCameWithSwitchRef.current = tabRef.current !== "recent";
     setSelectedPath(cli);
     setActiveManual(cli);
     setFocus("versions");
     setTab("recent");
+    // A file you just opened has to be on screen: Recent's own search or tag
+    // filter would hide it, leaving a selection you can't see.
+    setSearchByTab((prev) => ({ ...prev, recent: "" }));
+    setSearchOpen(false);
+    setTagFilter([]);
     // Warm meta for CLI file (may not be in recents yet)
     try {
       const m = await api.getFileMeta(cli);
@@ -2151,9 +2158,13 @@ export default function App() {
             return;
           }
           if (toes[0]) {
+            selectionCameWithSwitchRef.current = tabRef.current !== "recent";
             setSelectedPath(toes[0]);
             setActiveManual(toes[0]);
             setTab("recent");
+            setSearchByTab((prev) => ({ ...prev, recent: "" }));
+            setSearchOpen(false);
+            setTagFilter([]);
           }
         } else if (event.payload.type === "leave") {
           paletteDropFolderRef.current = null;
@@ -2319,14 +2330,26 @@ export default function App() {
   // in it; a tab with nothing remembered picks its natural default (Templates:
   // the Default template, Recent Files: the newest project).
   const tabSelectionRef = useRef<Partial<Record<TabId, string>>>({});
+  /** Set right before a tab switch that carries its own selection (a .toe
+   *  opened from Explorer, dropped on the window): the switch must keep it,
+   *  even when Recent's filter hides that file or spells its path otherwise.
+   *  Read once by the tab-switch effect below. */
+  const selectionCameWithSwitchRef = useRef(false);
   useEffect(() => {
     if (selectedPath) tabSelectionRef.current[tab] = selectedPath;
     // Deliberately not keyed on `tab`: a switch alone must not file the old
     // tab's selection under the new one.
   }, [selectedPath]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
+    // A file opened or dropped picks its own selection; never trade it for
+    // the tab's remembered one. That swap is how a double-clicked .toe ended
+    // up launching whatever Recent's search had selected.
+    if (selectionCameWithSwitchRef.current) {
+      selectionCameWithSwitchRef.current = false;
+      return;
+    }
     // A selection that already belongs to this tab came WITH the switch (a
-    // dropped .toe, a menu that selects and switches) -- keep it.
+    // menu that selects and switches) -- keep it.
     if (selectedPath && items.some((i) => i.path === selectedPath)) return;
     const remembered = tabSelectionRef.current[tab];
     if (remembered && items.some((i) => i.path === remembered)) {
