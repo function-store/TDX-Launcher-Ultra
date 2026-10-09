@@ -1,0 +1,76 @@
+#!/bin/sh
+#
+# Local release gate. This is where TDXLU's tests run -- NOT in GitHub Actions.
+#
+# Why here: this is a private repo, so Actions minutes bill against the account
+# quota with a 2x multiplier on Windows and 10x on macOS. One app release is
+# already ~100 billable minutes. A cloud test job would add a second runner and
+# a second cold compile for a suite that takes about a second on a warm target
+# directory. So the gate lives on the machine that already has that directory.
+#
+# Enable once per clone:
+#     git config core.hooksPath .githooks
+#
+# Skip deliberately (a WIP branch, a docs-only push):
+#     git push --no-verify
+#
+# Keep every check here fast and offline. The moment this hook is slow enough
+# to be annoying, it starts getting --no-verify'd and stops being a gate.
+
+set -e
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+# Nothing Rust or TypeScript in this push? Then there is nothing to gate.
+range=$(git diff --name-only "@{push}"..HEAD 2>/dev/null || git diff --name-only HEAD~1..HEAD 2>/dev/null || echo "")
+if [ -n "$range" ] && ! printf '%s\n' "$range" | grep -qE '^(src/|src-tauri/|package(-lock)?\.json|tsconfig.*\.json|vite\.config)'; then
+  echo "pre-push: no Rust/TS changes in this push -- skipping checks"
+  exit 0
+fi
+
+fail() {
+  echo ""
+  echo "pre-push: $1 failed. Fix it, or push with --no-verify if you meant to."
+  exit 1
+}
+
+# Quiet on success, loud on failure. A hook that prints a screenful of
+# pre-existing clippy warnings on every push is a hook that gets --no-verify'd
+# within a week, and then it is not a gate at all.
+run() {
+  label=$1
+  shift
+  echo "pre-push: $label"
+  if ! out=$("$@" 2>&1); then
+    printf '%s\n' "$out"
+    fail "$label"
+  fi
+  printf '%s' "$out" | grep -E '^(test result|warning: .* generated)' || true
+}
+
+run "cargo test" sh -c 'cd src-tauri && cargo test --quiet'
+
+# Advisory, not a gate: clippy currently emits 26 style warnings (too many
+# arguments, complex types, items after a test module) that predate this hook.
+# It fails only on a genuine compile error. Add `-- -D warnings` once that
+# backlog is cleared, and delete this comment when you do.
+run "cargo clippy" sh -c 'cd src-tauri && cargo clippy --all-targets --quiet'
+
+# NOT `npx`. On Windows, `npx` is a bash script (`#!/usr/bin/env bash`), and
+# the PATH git hands a hook resolves `bash` to C:\Windows\System32\bash.exe --
+# the WSL launcher -- which then fails with
+#   CreateProcessCommon:818: execvpe(/bin/bash) failed
+# on a machine with no WSL distro installed. `node` is a real .exe with no
+# shebang indirection, so calling the compiler through it is stable under
+# whatever PATH git provides.
+echo "pre-push: tsc --noEmit"
+if [ -f node_modules/typescript/bin/tsc ]; then
+  node node_modules/typescript/bin/tsc --noEmit || fail "tsc"
+else
+  # A fresh clone before `npm ci`. Missing dev dependencies are not a reason
+  # to block a push, but say so rather than passing silently.
+  echo "pre-push: typescript not installed -- skipping tsc (run npm ci)"
+fi
+
+echo "pre-push: ok"

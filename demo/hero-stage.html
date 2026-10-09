@@ -1,0 +1,374 @@
+<!doctype html>
+<!-- Hero-recording stage (dev-only, not a build entry): hosts the demo app in
+     an iframe and, on cue, shrinks it to a top-left PIP over a mocked-up
+     TouchDesigner network editor so Patreon components can be "dragged" in.
+     The network mimics a real TD screenshot: small dense TOP nodes with
+     lavender flag strips, a green CHOP exporting into a noise TOP, a
+     thick-framed COMP, feTurbulence noise viewers, periwinkle wires, and a
+     green current-node border on the dropped tools.
+     Driven by scripts/hero/record-hero.mjs through window.stage. -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>hero stage</title>
+<style>
+  html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #16171b; }
+
+  /* ── Mock TouchDesigner network ── */
+  #td {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(rgba(190,196,222,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(190,196,222,0.05) 1px, transparent 1px),
+      #17181c;
+    background-size: 106px 106px, 106px 106px, 100% 100%;
+    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', monospace;
+  }
+
+  #td-watermark {
+    position: absolute; left: 18px; bottom: 14px; z-index: 3;
+    font: 500 12px Verdana, sans-serif; letter-spacing: 0.04em;
+    color: rgba(200,205,225,0.38);
+    pointer-events: none; user-select: none;
+  }
+
+  #wires { position: absolute; inset: 0; pointer-events: none; }
+  #wires path { stroke: #7c81c9; stroke-width: 1.1; fill: none; opacity: 0.75; }
+  #wires path.thin { stroke-width: 0.9; opacity: 0.5; }
+
+  /* ── TD node chrome (small, like a zoomed-out network) ── */
+  .tdnode { position: absolute; width: 122px; }
+  .tdnode .chrome {
+    position: relative; display: flex;
+    background: #7f7f7f; padding: 3px 3px 3px 0;
+  }
+  .tdnode .flags {
+    width: 14px; margin-right: 3px; background: #8a88c8;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: space-around; padding: 1px 0;
+  }
+  .tdnode .flags i {
+    display: block; width: 6px; height: 6px; border-radius: 1.5px;
+    background: rgba(38,38,58,0.42);
+  }
+  .tdnode .flags i.rnd { border-radius: 50%; }
+  .tdnode .viewer {
+    width: 100px; height: 60px; overflow: hidden; background: #101013;
+    display: grid; place-items: center;
+  }
+  .tdnode .viewer img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tdnode .namebar { display: flex; align-items: stretch; margin-top: 1px; height: 21px; }
+  .tdnode .nm {
+    background: rgba(24,24,26,0.92); border: 1px solid #4c4c4c;
+    color: #d9d9d9; font-size: 15px; line-height: 19px; padding: 0 6px;
+    white-space: nowrap; z-index: 1;
+  }
+  .tdnode .cell {
+    width: 17px; margin-left: 1px; background: #2c2c2e; border: 1px solid #4c4c4c;
+    display: grid; place-items: center; color: #8f8f8f; font-size: 9px;
+  }
+  .tdnode .cell .dotc { width: 7px; height: 7px; border-radius: 50%; background: #39415f; }
+  .port {
+    position: absolute; width: 5px; height: 10px;
+    background: #9fa3e3; border: 1px solid #22222a; z-index: 1;
+  }
+  .port.pin  { left: -4px; top: 22px; }
+  .port.pin2 { left: -4px; top: 36px; }
+  .port.pout  { right: -3px; top: 14px; }
+  .port.pout2 { right: -3px; top: 30px; }
+
+  /* CHOP node: green strip, value readout, export arrow to its target. */
+  .tdnode.chop .flags { background: #79b06a; }
+  .tdnode.chop .port { background: #9ccf8b; }
+  .tdnode.chop .viewer {
+    background: #333338; color: #e6e6e6; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 2px;
+  }
+  .tdnode.chop .viewer .vbar { width: 3px; height: 34px; background: #b9c4e8; opacity: 0.85; }
+  .exportarrow {
+    position: absolute; width: 0; height: 0; z-index: 1;
+    border-left: 12px solid transparent; border-right: 12px solid transparent;
+    border-top: 16px solid #565664;
+  }
+
+  /* COMP with the heavier gray frame (feedbackEdge in the reference). */
+  .tdnode.comp { width: 150px; }
+  .tdnode.comp .chrome { border: 4px solid #6e6e6e; padding: 4px 4px 4px 0; }
+  .tdnode.comp .viewer { width: 118px; height: 72px; }
+  .tdnode.comp .nm { font-size: 15px; }
+
+  /* Dropped tools: current-node green border, gray body. */
+  .dropnode { display: none; width: 134px; }
+  .dropnode.landed { display: block; animation: pop 0.32s cubic-bezier(0.2, 1.4, 0.4, 1); }
+  .dropnode .outline { border: 3px solid #2f9e33; padding: 2px; background: #17181c; }
+  .dropnode .viewer { background: #8f8f93; }
+  @keyframes pop { 0% { transform: scale(0.65); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  /* ── Phone remote (slides in for the closing beat) ── */
+  #phone {
+    position: absolute; right: 36px; bottom: -720px; z-index: 6;
+    width: 316px; height: 664px;
+    background: #060607;
+    border: 3px solid #3a3a42;
+    border-radius: 46px;
+    box-shadow: 0 34px 90px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.5);
+    padding: 12px;
+    transition: bottom 0.9s cubic-bezier(0.3, 0.9, 0.2, 1);
+  }
+  body.phone #phone { bottom: 26px; }
+  #phone .screen {
+    width: 292px; height: 640px; border-radius: 34px; overflow: hidden;
+    background: #101014;
+  }
+  #phone iframe {
+    width: 375px; height: 790px; border: 0; display: block;
+    /* Leave a status-bar band under the island so it never covers the header. */
+    transform: translateY(34px) scale(0.7787); transform-origin: top left;
+  }
+  #phone .island {
+    position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+    width: 86px; height: 22px; border-radius: 12px; background: #000;
+    z-index: 2; pointer-events: none;
+  }
+
+  /* ── The launcher window (iframe) ── */
+  #appwin {
+    position: absolute; inset: 0;
+    transform-origin: top left;
+    transition: transform 0.85s cubic-bezier(0.55, 0, 0.15, 1), border-radius 0.85s, box-shadow 0.85s;
+    overflow: hidden; background: #0a0a0a;
+    z-index: 5;
+  }
+  #appwin iframe { width: 1280px; height: 800px; border: 0; display: block; }
+  body.pip #appwin {
+    transform: translate(22px, 22px) scale(0.44);
+    border-radius: 18px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.75), 0 0 0 2px #33343e;
+  }
+
+  /* ── Drag ghost chip ── */
+  #chip {
+    position: fixed; z-index: 50; display: none;
+    padding: 7px 14px; border-radius: 8px;
+    background: rgba(16,20,16,0.95);
+    border: 1px solid #4ade80;
+    color: #4ade80; font: 600 13px 'Segoe UI', system-ui, sans-serif;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.6);
+    pointer-events: none; white-space: nowrap;
+    transform: translate(14px, 10px);
+  }
+
+  /* Cursor dot for the recording (parent surface). */
+  #dot {
+    position: fixed; z-index: 60; width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 0 10px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.35);
+    pointer-events: none; transform: translate(-50%,-50%);
+    left: -40px; top: -40px;
+  }
+</style>
+</head>
+<body>
+
+<div id="td">
+  <div id="td-watermark">TouchDesigner mockup — for illustration</div>
+  <svg id="wires" width="1280" height="800">
+    <!-- noise1 → feedbackEdge -->
+    <path d="M 322 552 C 334 552, 336 556, 348 556" />
+    <!-- feedbackEdge → normal1 (curves up) · → comp1 (long right) -->
+    <path d="M 502 548 C 520 548, 520 452, 538 452" />
+    <path d="M 502 556 C 640 560, 720 548, 848 552" />
+    <!-- normal1 → mono1 · mono1 → off right (thin) -->
+    <path d="M 662 452 C 672 452, 676 452, 686 452" />
+    <path class="thin" d="M 810 452 C 980 452, 1130 430, 1290 424" />
+    <!-- comp1 → bloom1 -->
+    <path d="M 972 552 C 982 552, 986 552, 996 552" />
+  </svg>
+
+  <!-- speed1: green CHOP exporting down into noise1 -->
+  <div class="tdnode chop" style="left:200px; top:412px;">
+    <div class="chrome">
+      <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+      <div class="viewer"><span>.26</span><span class="vbar"></span><span>cha</span></div>
+      <span class="port pin"></span><span class="port pout"></span>
+    </div>
+    <div class="namebar"><span class="nm">speed1</span><span class="cell"><span class="dotc"></span></span><span class="cell">+</span></div>
+    <div class="exportarrow" style="left:24px; top:92px;"></div>
+  </div>
+
+  <div class="tdnode" style="left:200px; top:528px;">
+    <div class="chrome">
+      <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+      <div class="viewer"><img src="" data-noise="fine" alt=""></div>
+      <span class="port pin"></span><span class="port pout"></span>
+    </div>
+    <div class="namebar"><span class="nm">noise1</span><span class="cell"><span class="dotc"></span></span><span class="cell">+</span></div>
+  </div>
+
+  <div class="tdnode comp" style="left:348px; top:512px;">
+    <div class="chrome">
+      <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+      <div class="viewer"><img src="" data-noise="marble" alt=""></div>
+      <span class="port pin"></span><span class="port pout"></span>
+    </div>
+    <div class="namebar"><span class="nm">feedbackEdge</span></div>
+  </div>
+
+  <div class="tdnode" style="left:538px; top:412px;">
+    <div class="chrome">
+      <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+      <div class="viewer" style="background:#8f8fd8;"></div>
+      <span class="port pin"></span><span class="port pout"></span>
+    </div>
+    <div class="namebar"><span class="nm">normal1</span><span class="cell"><span class="dotc"></span></span><span class="cell">+</span></div>
+  </div>
+
+  <div class="tdnode" style="left:686px; top:412px;">
+    <div class="chrome">
+      <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+      <div class="viewer" style="background:#9a9a9e;"></div>
+      <span class="port pin"></span><span class="port pout"></span>
+    </div>
+    <div class="namebar"><span class="nm">mono1</span><span class="cell"><span class="dotc"></span></span><span class="cell">+</span></div>
+  </div>
+
+  <div class="tdnode" style="left:848px; top:528px;">
+    <div class="chrome">
+      <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+      <div class="viewer"><img src="" data-noise="blobs" alt=""></div>
+      <span class="port pin"></span><span class="port pin2"></span><span class="port pout"></span>
+    </div>
+    <div class="namebar"><span class="nm">comp1</span><span class="cell"><span class="dotc"></span></span><span class="cell">+</span></div>
+  </div>
+
+  <div class="tdnode" style="left:996px; top:528px;">
+    <div class="chrome">
+      <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+      <div class="viewer"><img src="" data-noise="blobsBright" alt=""></div>
+      <span class="port pin"></span><span class="port pout"></span>
+    </div>
+    <div class="namebar"><span class="nm">bloom1</span><span class="cell"><span class="dotc"></span></span><span class="cell">+</span></div>
+  </div>
+
+  <!-- Dragged-in tools: green current-node border, gray body. -->
+  <div class="tdnode dropnode" id="drop1" style="left:615px; top:196px;">
+    <div class="outline">
+      <div class="chrome">
+        <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+        <div class="viewer"></div>
+        <span class="port pin"></span><span class="port pout"></span>
+      </div>
+      <div class="namebar"><span class="nm">TDMap</span><span class="cell">+</span></div>
+    </div>
+  </div>
+  <div class="tdnode dropnode" id="drop2" style="left:790px; top:196px;">
+    <div class="outline">
+      <div class="chrome">
+        <div class="flags"><i class="rnd"></i><i></i><i></i><i class="rnd"></i></div>
+        <div class="viewer"></div>
+        <span class="port pin"></span><span class="port pout"></span>
+      </div>
+      <div class="namebar"><span class="nm">GSOPs</span><span class="cell">+</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="phone" aria-hidden="true">
+  <div class="island"></div>
+  <div class="screen"><iframe src="/control.html" tabindex="-1"></iframe></div>
+</div>
+
+<div id="appwin"><iframe id="app" src="/"></iframe></div>
+<div id="chip"></div>
+<div id="dot"></div>
+
+<script>
+  // Grayscale noise viewers, TD-style, via SVG feTurbulence data URLs.
+  function noiseUrl(freq, octaves, extra = '') {
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60">` +
+      `<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="${octaves}" seed="7"/>` +
+      `<feColorMatrix type="saturate" values="0"/>` + extra +
+      `</filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>`;
+    return 'data:image/svg+xml,' + encodeURIComponent(svg).replace(/%2523/g, '%23');
+  }
+  const contrast =
+    '<feComponentTransfer><feFuncR type="gamma" exponent="2.2"/><feFuncG type="gamma" exponent="2.2"/><feFuncB type="gamma" exponent="2.2"/></feComponentTransfer>';
+  const bright =
+    '<feComponentTransfer><feFuncR type="gamma" exponent="1.1" amplitude="1.5"/><feFuncG type="gamma" exponent="1.1" amplitude="1.5"/><feFuncB type="gamma" exponent="1.1" amplitude="1.5"/></feComponentTransfer>';
+  const marbleTint =
+    '<feColorMatrix type="matrix" values="1.1 0 0 0 0.02  0 0.9 0 0 0.0  0 0 1.05 0 0.04  0 0 0 1 0"/>';
+  const NOISES = {
+    fine: noiseUrl(0.9, 2, contrast),
+    marble: noiseUrl(0.045, 4, marbleTint),
+    blobs: noiseUrl(0.06, 3, contrast),
+    blobsBright: noiseUrl(0.06, 3, bright),
+  };
+  document.querySelectorAll('[data-noise]').forEach((img) => {
+    img.src = NOISES[img.dataset.noise];
+  });
+
+  // Keep in sync with body.pip in the CSS above.
+  const PIP_SCALE = 0.44, PIP_X = 22, PIP_Y = 22;
+
+  const dot = document.getElementById('dot');
+  const chip = document.getElementById('chip');
+  let dragging = false;
+
+  /** THE cursor: one dot, stage-owned, fed from both surfaces. */
+  function moveCursor(x, y) {
+    dot.style.left = x + 'px';
+    dot.style.top = y + 'px';
+    if (dragging) {
+      chip.style.left = x + 'px';
+      chip.style.top = y + 'px';
+    }
+  }
+
+  window.addEventListener('mousemove', (e) => moveCursor(e.clientX, e.clientY), true);
+
+  // Mouse events over the iframes never reach this window — forward them,
+  // mapped through each frame's transform, so the single dot follows the
+  // action on every surface without jumps or freezes.
+  document.getElementById('app').addEventListener('load', function () {
+    this.contentDocument.addEventListener('mousemove', (e) => {
+      const pip = document.body.classList.contains('pip');
+      const s = pip ? PIP_SCALE : 1;
+      moveCursor((pip ? PIP_X : 0) + e.clientX * s, (pip ? PIP_Y : 0) + e.clientY * s);
+    }, true);
+  });
+  const phoneIfr = document.querySelector('#phone iframe');
+  phoneIfr.addEventListener('load', function () {
+    this.contentDocument.addEventListener('mousemove', (e) => {
+      const r = phoneIfr.getBoundingClientRect(); // includes translate + scale
+      const s = r.width / phoneIfr.offsetWidth;
+      moveCursor(r.left + e.clientX * s, r.top + e.clientY * s);
+    }, true);
+  });
+
+  window.stage = {
+    /** Shrink the launcher to a PIP, revealing the TD mock. */
+    pip() {
+      document.body.classList.add('pip');
+    },
+    beginDrag(label, x, y) {
+      chip.textContent = label;
+      chip.style.left = x + 'px';
+      chip.style.top = y + 'px';
+      chip.style.display = 'block';
+      dragging = true;
+    },
+    /** Slide the phone remote in over the network. */
+    phone() {
+      document.body.classList.add('phone');
+    },
+    /** Land the given drop node (drop1 | drop2). */
+    drop(id) {
+      dragging = false;
+      chip.style.display = 'none';
+      document.getElementById(id).classList.add('landed');
+    },
+  };
+</script>
+</body>
+</html>

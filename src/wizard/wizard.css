@@ -1,0 +1,141 @@
+/* -- Post-install setup wizard ------------------------------------------------
+   A stepped modal (reuses .modal-backdrop / .modal chrome from App.css) shown
+   once after the first-run tour. Sits above regular modals but below the tour
+   overlay so a re-run tour would still win. */
+
+.wizard-backdrop {
+  z-index: 400;
+}
+
+.wizard-modal {
+  width: 440px;
+  max-width: calc(100vw - 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wizard-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.wizard-modal h2 {
+  margin-top: -4px;
+}
+
+.wizard-body {
+  overflow-y: auto;
+  min-height: 190px;
+  flex-shrink: 1;
+}
+
+/* Checkbox rows stack like inside .settings-group (whose flex column normally does this) */
+.wizard-body label.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+  cursor: pointer;
+}
+
+.wizard-inline-actions {
+  justify-content: flex-start;
+  margin: 10px 0 6px;
+}
+
+.wizard-error {
+  color: #ff8a8a;
+  font-size: 12px;
+}
+
+.wizard-hotkey {
+  margin-left: 24px;
+}
+
+/* Optional-extras rows: description left, action right */
+.wizard-extra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  margin: 6px 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.wizard-extra > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wizard-extra strong {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.wizard-extra .help-tip {
+  margin: 0;
+}
+
+.wizard-extra button {
+  flex-shrink: 0;
+}
+
+/* -- Progress dots (same vocabulary as the tour) ------------------------------ */
+.wizard-progress {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.wizard-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+.wizard-dot--active {
+  background: var(--accent);
+  transform: scale(1.4);
+}
+
+.wizard-dot--done {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* -- Navigation row ----------------------------------------------------------- */
+.wizard-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+
+.wizard-nav__skip {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 2px 4px;
+  margin-right: auto;
+  transition: color 0.15s;
+}
+
+.wizard-nav__skip:hover:not(:disabled) {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+}

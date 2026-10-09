@@ -1,0 +1,22 @@
+TD Launcher Plus — Credits
+
+Thank you to everyone who contributed to this project.
+https://github.com/function-store/TD-Launcher-Plus
+
+Contributors:
+- Dan Molnar / Function Store
+  - Primary developer of the 2.0 "Plus" edition.
+  - Implemented macOS support, Recent Files dashboard, Templates library, Icon previews, and the integrated README documentation editor.
+  - Website: https://functionstore.xyz/link-in-bio
+
+- Lucas Morgan (EnviralDesign)
+  - Architected the original TD Launcher core, version detection, and auto-launch systems.
+  - Repository: https://github.com/EnviralDesign/TD-Launcher
+  - Website: https://www.enviral-design.com/
+
+- Keith Lostracco
+  - Improved detection of custom/daily TouchDesigner builds and Windows registry discovery logic.
+  - PR: https://github.com/EnviralDesign/TD-Launcher/pull/5
+
+Full list of contributors:
+- https://github.com/EnviralDesign/TD-Launcher/graphs/contributors

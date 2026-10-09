@@ -1,0 +1,93 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "TDX Launcher Ultra",
+  "version": "0.22.3",
+  "identifier": "xyz.functionstore.tdxlu",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5183",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "TDX Launcher Ultra",
+        "width": 720,
+        "height": 720,
+        "minWidth": 480,
+        "minHeight": 420,
+        "resizable": true,
+        "fullscreen": false,
+        "dragDropEnabled": true,
+        "visible": false,
+        "backgroundColor": [
+          26,
+          26,
+          30,
+          255
+        ]
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "**"
+        ]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [
+      "resources/toeexpand",
+      "icons/32x32.png",
+      "../release/TDXLauncherUtility.tox",
+      "../release/FNSTools.tox",
+      "../release/fns",
+      "../dist"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "toe"
+        ],
+        "name": "TouchDesigner Project",
+        "description": "TouchDesigner Project File",
+        "role": "Editor"
+      }
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15",
+      "files": {
+        "Resources/Assets.car": "icons/Assets.car",
+        "Resources/toe-document.icns": "icons/toe-document.icns"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://launchdl.functionstore.tools/app/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIxNjk1Qzk5MThDRTU0NkEKUldScVZNNFltVnhwSWZJM3Q4NStCVytpRjBML1Z6TnhNOGsvY0tGNDd6dWVXU3VnVWFuYTNOMUcK"
+    }
+  }
+}

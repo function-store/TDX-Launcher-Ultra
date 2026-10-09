@@ -1,0 +1,14 @@
+{
+  "release": "v3.2.64",
+  "sha256": "af3b46bd9449192294922fa8a2f5101926c35344792fa0ffef6885499fbdf0c7",
+  "bytes": 424694,
+  "url": "https://storage.functionstore.tools/fnstools/v3.2.64/FNSTools.tox",
+  "seeded": [
+    {
+      "name": "FNS_Autosave",
+      "version": "3.2.5",
+      "sha256": "ebf6a760bccaa9fe664d634f0ed1f62b0ca3a8c78ee05c56e78eb21ea0dae104"
+    }
+  ],
+  "fetched_at": "2026-10-06T13:20:46.835Z"
+}

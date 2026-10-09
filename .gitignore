@@ -1,0 +1,121 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Tauri
+src-tauri/target
+src-tauri/gen
+/installers
+
+# Local-only signing/notarization env vars -- never commit real key material
+/scripts/local-signing-env.sh
+# Per-machine release secrets (Cloudflare token etc.), read by the release scripts
+/.env.release
+
+# Build outputs (demo and main app builds)
+/website/demo
+
+# Staged R2 release tree (scripts/prepare-*.mjs) and downloaded CI bundles
+/dist-release
+/artifacts
+
+# Embody Releaseall export destination. The shipped companion TOX is tracked
+# right here; sibling exports (TDXLUSensors.tox, …) are staging noise.
+/release/*
+!/release/TDXLauncherUtility.tox
+# The FNSTools bootstrap the launcher bundles stays OUT of git: it is fetched
+# from the release bucket at build time and sha-verified
+# (scripts/fetch-fns-bootstrap.mjs, wired into tauri:build / release:prepare).
+# Committing it invites shipping a hand-copied dev build. The RECORD of which
+# release was fetched is tracked instead, so "what does this installer carry?"
+# is answerable from git alone.
+!/release/FNSTools.json
+# Bundled capability artifacts (free + launcher-capable only) — fetched and
+# digest-verified at build time by the same script. Never committed: a gated
+# package must never reach a public installer via a stale local copy.
+/release/fns/
+
+# Embody / Envoy (auto-managed)
+Backup/
+logs/
+CrashAutoSave*
+.venv/
+.mcp.json
+.embody/*
+!.embody/project.json
+.claude/settings.local.json
+.claude/projects/
+briefs/
+__pycache__/
+/.cursor
+/utility/.tdn_backup
+/utility/.tdn_backup
+/utility/.tdn_backup
+/utility/.tdn_backup
+/utility/preview
+/utility/.tdn_backup
+/utility/.tdn_backup
+/.claude
+opencode.json
+.tdn_backup/
+
+# Vendored FunctionStore helper library inside the companion utility.
+# Embody tracks these DATs (the .tdn references them via file+syncfile, so the
+# files MUST exist on disk or a TDN reconstruct rebuilds them empty), but the
+# code is third-party and has never been version-controlled here. Ignore the
+# files rather than untagging the ops -- untagging strips the file refs from
+# the .tdn and the content then survives only in the .toe.
+/utility/TDXLauncherUtility/ExtUtils/
+/utility/TDXLauncherUtility/FNS_About/
+# Editor stubs ExtUtils' stub tool generates for that same vendored library.
+/utility/typings/
+
+# Vercel CLI link
+/.vercel
+utility/TDXLPP.*.toe
+
+# macOS icon work. scripts/build-macos-icons.py needs exactly three inputs --
+# the layered assets/TDXLU.icon document, the Default export it cuts the .icns
+# from, and assets/icon_default_mono.png -- so those stay tracked along with
+# everything it writes into src-tauri/icons/. Every other appearance export is
+# a preview of what macOS composites itself from the compiled catalog, and the
+# loose assets/macos-iOS-*.png at the top of assets/ are a superseded copy of
+# the same set.
+assets/macos Exports/*
+!assets/macos Exports/macos-iOS-Default-1024x1024@1x.png
+assets/macos-iOS-*.png
+
+# Internal working notes (agent briefs, handoffs, plans, worklists). Kept on
+# disk, never published.
+/CLAUDE.md
+/AGENTS.md
+/HANDOFF.md
+/docs/audit-actions.md
+/docs/handoff-session-instances.md
+/docs/plan-tox-inject-uv.md
+/docs/fns-plus-port-notes.md
+
+# Mobile icon sets `tauri icon` regenerates; the app is desktop-only.
+/src-tauri/icons/android/
+/src-tauri/icons/ios/
+# TouchDesigner's import cache and Collect test output from the dev project.
+/utility/TDImportCache/
+/utility/collected/
+# Retired trial backend; local leftovers (.env, node_modules) must never be committed.
+/firebase/

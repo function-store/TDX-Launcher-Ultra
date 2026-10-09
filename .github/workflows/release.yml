@@ -1,0 +1,234 @@
+name: Release to R2
+
+# Two independent release channels, one bucket:
+#
+#   v*          → build + sign installers, publish app/latest.json
+#   utility-v*  → publish the companion TOX alone, no build, no signing key
+#
+# The utility tag is the whole point of the split: shipping a new TOX to every
+# launcher in the field costs one upload and no app release.
+#
+# Manual-only since 2026-09-08: releases are built and published from local
+# machines (docs/releases-local.md) because the hosted builds are slow and
+# burn Actions minutes. Tags are still pushed for history, so they must NOT
+# start a run; use workflow_dispatch when a CI release is deliberately wanted.
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Which channel to publish
+        required: true
+        default: utility
+        type: choice
+        options: [app, utility]
+      dry_run:
+        description: Stage and print, but do not upload
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  R2_BUCKET: ${{ vars.R2_BUCKET }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  # Which channel this run publishes. A tag decides it; workflow_dispatch asks.
+  route:
+    runs-on: ubuntu-latest
+    outputs:
+      channel: ${{ steps.pick.outputs.channel }}
+      dry_run: ${{ steps.pick.outputs.dry_run }}
+    steps:
+      - id: pick
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            channel="${{ inputs.channel }}"
+            dry="${{ inputs.dry_run }}"
+          elif [[ "${{ github.ref_name }}" == utility-v* ]]; then
+            channel=utility
+            dry=false
+          else
+            channel=app
+            dry=false
+          fi
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$dry" >> "$GITHUB_OUTPUT"
+          echo "Publishing channel: $channel (dry-run: $dry)"
+
+  # ---- App channel -------------------------------------------------------
+
+  # One job per Tauri platform key. The key is also the artifact name, because
+  # prepare-release.mjs reads the platform off the directory — Tauri's macOS
+  # updater bundle is named `<productName>.app.tar.gz` with no arch in it, so
+  # the filename cannot be trusted to say which build it is.
+  #
+  # Apple Silicon only on macOS — Apple hasn't shipped an Intel Mac since 2023
+  # and GitHub is retiring Intel macOS runners entirely around Fall 2027, so a
+  # darwin-x86_64 leg (macos-15-intel) was cut. Existing Intel Mac installs
+  # stop seeing updates after this; nothing else changes for them.
+  build:
+    needs: route
+    if: needs.route.outputs.channel == 'app'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows-x86_64
+            target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            platform: darwin-aarch64
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: ${{ matrix.target }}
+
+      - run: npm ci
+
+      # Loads the Developer ID Application cert into a throwaway keychain
+      # scoped to this runner. KEYCHAIN_PASSWORD is not an Apple credential --
+      # it only unlocks this ephemeral keychain, which dies with the runner.
+      - name: Import Apple certificate
+        if: runner.os == 'macOS'
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security import "$RUNNER_TEMP/certificate.p12" -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" build.keychain
+          rm "$RUNNER_TEMP/certificate.p12"
+
+      # APPLE_API_KEY_PATH has to point at a real file, but there's nowhere
+      # persistent to keep one on a fresh runner -- decode the base64 secret
+      # to $RUNNER_TEMP for this job only.
+      - name: Write Apple notarization key
+        if: runner.os == 'macOS'
+        env:
+          APPLE_API_KEY_FILE: ${{ secrets.APPLE_API_KEY_FILE }}
+        run: |
+          echo "$APPLE_API_KEY_FILE" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+          echo "APPLE_API_KEY_PATH=$RUNNER_TEMP/AuthKey.p8" >> "$GITHUB_ENV"
+
+      # Plain `tauri build` (not the ci-artifacts overlay, which disables
+      # updater artifacts). createUpdaterArtifacts is already true in
+      # tauri.conf.json, so each bundle gets a detached .sig alongside it.
+      # On macOS this also code-signs with the imported Developer ID cert and
+      # notarizes + staples via the App Store Connect API key -- both are
+      # no-ops on Windows since it ignores the APPLE_* vars.
+      - name: Build signed bundles
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+          APPLE_SIGNING_IDENTITY: "Developer ID Application: Daniel Molnar (Y23BK46GL6)"
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+        run: npx tauri build --target ${{ matrix.target }}
+
+      # `tauri build` notarizes+staples the .app but never submits the outer
+      # .dmg -- without this, a downloaded .dmg still fails Gatekeeper's own
+      # check the moment it's opened, even though the .app inside is clean.
+      - name: Notarize and staple DMG
+        if: runner.os == 'macOS'
+        env:
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+        run: node scripts/notarize-dmg.mjs ${{ matrix.target }}
+
+      - name: Remove temporary keychain
+        if: always() && runner.os == 'macOS'
+        run: security delete-keychain build.keychain || true
+
+      # One level under bundle/ only (bundle/<format>/<file>) — NOT bundle/**,
+      # which also matches deep inside the unpacked macOS .app (e.g. the
+      # toeexpand.exe helper bundled at Contents/Resources/resources/toeexpand/),
+      # uploading a stray Windows binary as if it were a macOS installer.
+      - name: Upload bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/*/*.exe
+            src-tauri/target/${{ matrix.target }}/release/bundle/*/*.msi
+            src-tauri/target/${{ matrix.target }}/release/bundle/*/*.dmg
+            src-tauri/target/${{ matrix.target }}/release/bundle/*/*.app.tar.gz
+            src-tauri/target/${{ matrix.target }}/release/bundle/*/*.sig
+          if-no-files-found: error
+
+  publish-app:
+    needs: [route, build]
+    if: needs.route.outputs.channel == 'app'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # Flattens to artifacts/<platform-key>/... — the layout prepare-release wants.
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Stage release tree
+        run: node scripts/prepare-release.mjs artifacts --notes RELEASE_NOTES.md
+
+      - name: Show what will be published
+        run: node scripts/publish-r2.mjs --only app --dry-run
+
+      - name: Publish to R2
+        if: needs.route.outputs.dry_run != 'true'
+        run: node scripts/publish-r2.mjs --only app
+
+  # ---- Utility channel ---------------------------------------------------
+
+  publish-utility:
+    needs: route
+    if: needs.route.outputs.channel == 'utility'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # Fails the run if UTILITY_VERSION and the extension constant disagree —
+      # a mismatch makes every launcher re-offer an update it just installed.
+      - name: Stage utility release
+        run: node scripts/prepare-utility-release.mjs
+
+      - name: Show what will be published
+        run: node scripts/publish-r2.mjs --only utility --dry-run
+
+      - name: Publish to R2
+        if: needs.route.outputs.dry_run != 'true'
+        run: node scripts/publish-r2.mjs --only utility

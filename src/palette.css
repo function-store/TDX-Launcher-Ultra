@@ -1,0 +1,852 @@
+/* Narrow-column layout for the page TouchDesigner's Palette Browser renders
+   (palette-standalone.tsx). Themes come from App.css (--bg / --text / --accent
+   …); everything here is sized for a ~300–400 px wide CEF texture driven by
+   forwarded mouse events, so targets are generous and nothing relies on
+   hover-only affordances. */
+
+html.palette-page,
+html.palette-page body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+html.palette-page #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.pt-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pt-head {
+  flex: 0 0 auto;
+  padding: 6px 6px 4px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--panel, rgba(255, 255, 255, 0.03));
+}
+.pt-title {
+  font-weight: 600;
+  padding: 4px 2px 6px;
+}
+.pt-subtabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+.pt-subtabs button {
+  flex: 1;
+  padding: 6px 0;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--text);
+  opacity: 0.75;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+.pt-subtabs button.on {
+  opacity: 1;
+  border-color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.pt-searchrow {
+  display: flex;
+  gap: 4px;
+}
+.pt-search {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  padding: 5px 8px;
+}
+.pt-icon,
+.pt-mini,
+.pt-place {
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px 7px;
+  line-height: 1;
+}
+.pt-place {
+  border-color: var(--accent);
+  color: var(--accent);
+  min-width: 30px;
+  font-weight: 700;
+}
+.pt-place:disabled,
+.pt-mini:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pt-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 4px 8px;
+}
+.pt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pt-group {
+  margin-bottom: 6px;
+}
+.pt-cat {
+  margin: 8px 4px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.pt-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 6px;
+  border-radius: 4px;
+  background: var(--panel, rgba(255, 255, 255, 0.04));
+  min-height: 30px;
+}
+.pt-row.dim {
+  opacity: 0.5;
+}
+.pt-rowbtn {
+  width: 100%;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pt-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-kind,
+.pt-ver {
+  font-size: 10px;
+  opacity: 0.6;
+  flex: 0 0 auto;
+}
+.pt-alt {
+  font-size: 10px;
+  opacity: 0.65;
+}
+.pt-dot {
+  flex: 0 0 auto;
+  opacity: 0.8;
+}
+.pt-folder {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pt-folderrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.pt-folderrow:hover,
+.pt-row:hover {
+  background: var(--panel-hover, rgba(255, 255, 255, 0.08));
+}
+.pt-twisty {
+  width: 12px;
+  opacity: 0.7;
+}
+.pt-muted {
+  padding: 10px 8px;
+  opacity: 0.7;
+}
+.pt-muted.small {
+  padding: 2px 6px 6px;
+  font-size: 11px;
+}
+.pt-error {
+  margin: 4px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.4);
+  word-break: break-word;
+}
+/* Same banner, palette-page scale — the column is ~314px wide, so it stays
+   tight and the button goes full-width-ish rather than floating. */
+.pt-trust {
+  margin: 4px;
+  padding: 8px 9px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 170, 60, 0.45);
+  background: rgba(255, 170, 60, 0.1);
+}
+.pt-trust-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffaa3c;
+  margin-bottom: 3px;
+}
+.pt-trust-body {
+  margin: 0 0 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.pt-trust-actions {
+  display: flex;
+}
+.pt-trust-actions button {
+  flex: 1;
+}
+.pt-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px 6px;
+}
+/* The scroll container is .pt-body (4 px top padding): pin the crumb bar to
+   its top edge with an opaque ground so rows slide under it. */
+.pt-sticky {
+  position: sticky;
+  top: -4px;
+  z-index: 2;
+  margin: -4px -4px 0;
+  padding: 6px 8px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+.pt-check {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  font-size: 11px;
+  opacity: 0.85;
+  cursor: pointer;
+}
+.pt-check input {
+  margin: 0;
+}
+.pt-link {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.pt-link:disabled {
+  color: var(--text);
+  opacity: 0.7;
+  cursor: default;
+}
+.pt-crumb {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.pt-avatar.blank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+.pt-post {
+  margin: 4px 0;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+.pt-post.locked {
+  opacity: 0.6;
+}
+.pt-posttitle {
+  padding: 2px 4px 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Companion update notice — one row under the header, accent-bordered so it
+   reads as an offer, not an error. */
+.pt-notice {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 4px 0;
+  padding: 5px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  background: var(--panel, rgba(255, 255, 255, 0.04));
+  font-size: 11px;
+}
+.pt-noticetext {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Commands: a row per command, its help under it, and an inline argument
+   form that unfolds under the row (no popups — the page is a texture). */
+.pt-cmd {
+  display: flex;
+  flex-direction: column;
+}
+/* Favourite star: hollow = pin, filled = pinned. Shared list with the
+   launcher (quick-launch Ctrl+D, Settings). The hollow star only shows
+   while the row is hovered (the companion forwards mouse moves, so hover
+   works inside TD); a pinned star is information and stays visible. */
+.pt-star {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 3px;
+  width: 20px;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 80ms;
+}
+.pt-row:hover .pt-star {
+  opacity: 0.55;
+}
+.pt-row:hover .pt-star:hover {
+  opacity: 1;
+}
+.pt-star.on {
+  opacity: 1;
+  color: #e0a34f;
+}
+.pt-tool {
+  font-size: 10px;
+  opacity: 0.6;
+}
+.pt-help {
+  padding: 0 6px 4px 8px;
+  font-size: 11px;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-chip {
+  flex: 0 0 auto;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  opacity: 0.85;
+  max-width: 72px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-chip.on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.pt-chip.off {
+  opacity: 0.5;
+}
+.pt-params {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 2px 6px 8px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--accent);
+  background: var(--panel, rgba(255, 255, 255, 0.03));
+}
+.pt-param {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+.pt-param > span {
+  flex: 0 0 38%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-param input:not([type="checkbox"]),
+.pt-param select {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11px;
+  padding: 3px 6px;
+}
+.pt-paramrow {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* Toolbox: pin the session's selected COMP (the inverse of ↳). */
+.pt-pinrow {
+  display: flex;
+  gap: 4px;
+  padding: 2px 2px 6px;
+}
+.pt-pinrow select {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11px;
+  padding: 3px 6px;
+}
+.pt-pin {
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+/* Session bar: the expanded session card's free verbs + an ambient health line. */
+.pt-bar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--panel, rgba(255, 255, 255, 0.03));
+}
+.pt-barbtn {
+  font: inherit;
+  font-size: 11px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  padding: 3px 7px;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pt-barbtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.pt-as.on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* Drawers the session bar unfolds above itself (Git, Backup). */
+.pt-drawer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px 6px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--panel, rgba(255, 255, 255, 0.03));
+  font-size: 11px;
+}
+.pt-drawerhead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* 300 px of column: the summary shrinks, the controls never wrap or clip. */
+.pt-drawerhead .pt-mini {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.pt-drawerhead .pt-name {
+  min-width: 0;
+}
+.pt-drawerrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.pt-drawerrow .pt-place,
+.pt-drawerrow .pt-barbtn,
+.pt-drawerrow .pt-mini {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.pt-drawerrow input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11px;
+  padding: 3px 6px;
+}
+.pt-drawerrow .pt-check {
+  margin-left: 0;
+}
+/* File / ref lists inside a drawer: capped, scroll within, tiny rows. */
+.pt-drawerlist {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 170px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2px 0;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+}
+.pt-drawerfile {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 20px;
+  padding: 1px 2px;
+  font-size: 11px;
+  cursor: default;
+}
+.pt-drawerfile input {
+  margin: 0;
+}
+.pt-dot.off {
+  opacity: 0.35;
+}
+
+/* Row preview: the real file, rendered by the browser at row size. */
+.pt-thumb {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 30px;
+  border-radius: 3px;
+  object-fit: cover;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+.pt-thumb.glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  opacity: 0.5;
+}
+.pt-thumb.glyph.missing {
+  color: #ff8f8f;
+  opacity: 0.8;
+}
+.pt-mediarow {
+  gap: 6px;
+  min-height: 34px;
+}
+.pt-mediarow.missing .pt-name {
+  opacity: 0.65;
+}
+/* Name over a secondary line, inside a row that also carries a thumb. */
+.pt-drawerfile .pt-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.pt-drawerfile .pt-sum {
+  font-size: 10px;
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Session sub-tab: tool rows with a live summary line, each opening full-column. */
+.pt-sessionrow {
+  align-items: center;
+  min-height: 40px;
+}
+.pt-sessionrow .pt-glyph {
+  flex: 0 0 22px;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.85;
+}
+.pt-sessionrow .pt-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.pt-sessionrow .pt-sum {
+  font-size: 10px;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-sessionrow .pt-chev {
+  flex: 0 0 auto;
+  opacity: 0.5;
+}
+/* A tool opened full-column: the same components as before, no strip chrome,
+   lists free to grow. */
+.pt-panel .pt-drawer {
+  border-top: 0;
+  background: transparent;
+  padding: 4px 2px;
+  font-size: 12px;
+}
+.pt-panel .pt-drawerhead .pt-name {
+  font-weight: 600;
+}
+.pt-panel .pt-drawerlist {
+  max-height: none;
+}
+.pt-panel .pt-drawerfile {
+  min-height: 26px;
+  font-size: 12px;
+}
+.pt-panel .pt-qr img {
+  width: 220px;
+  height: 220px;
+}
+/* Phone Remote QR: centred, the link under it. */
+.pt-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 0;
+}
+.pt-qr img {
+  width: 160px;
+  height: 160px;
+  border-radius: 4px;
+  background: #fff;
+}
+.pt-qr .pt-muted {
+  padding: 0;
+  font-size: 10px;
+  word-break: break-all;
+  text-align: center;
+}
+
+.pt-perf {
+  flex: 1 1 100%;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-perf.warn {
+  opacity: 1;
+  color: #ffb36b;
+}
+
+.pt-foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: var(--panel, rgba(255, 255, 255, 0.03));
+  font-size: 11px;
+  min-height: 26px;
+}
+.pt-session {
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+}
+.pt-toast {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--accent);
+}
+.pt-toast.warn {
+  color: #ffb36b;
+}
+
+/* Right-click menu (Patreon rows). Fixed-position so it escapes the scrolling
+   column; the component clamps left/top into the viewport because this panel
+   is only ~314 px wide and TD's Palette Browser clips, it does not scroll. */
+.pt-menu {
+  position: fixed;
+  z-index: 40;
+  min-width: 150px;
+  max-width: 260px;
+  padding: 4px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 6px;
+  background: var(--panel-solid, #1f1f24);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+.pt-menu-title {
+  padding: 3px 8px 5px;
+  opacity: 0.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  margin-bottom: 3px;
+}
+.pt-menu-item {
+  display: block;
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pt-menu-item:hover:not(:disabled) {
+  background: var(--accent, #4a9eff);
+  color: #fff;
+}
+.pt-menu-item:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* --- Cached-component search ---------------------------------------------
+   Results from the whole cache, above the creator list they came from. */
+.pt-sectionhead {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 2px 2px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+}
+.pt-sectioncount {
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: 0;
+}
+/* Filename on top (it is what was typed), creator + post beneath it. */
+.pt-hittext {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.pt-hitwhere {
+  font-size: 10px;
+  opacity: 0.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-hit.locked {
+  opacity: 0.55;
+}
+
+/* FNS shelf: All / Free / Plus — the desktop FNSTools tab's access filter,
+   styled like the sub-tabs above so it reads as "which rows", not an action. */
+.pt-access {
+  display: flex;
+  gap: 2px;
+  margin: 2px 0 6px;
+}
+.pt-access button {
+  flex: 1;
+  padding: 3px 0;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--text);
+  opacity: 0.75;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+}
+.pt-access button.active {
+  opacity: 1;
+  border-color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.pt-access-count {
+  font-size: 10px;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Plus rail: the tier badge on a gated package. Locked = accent outline
+   (click ✦ to open the tier page); owned = muted, it is just a fact. */
+.pt-tier {
+  flex: 0 1 auto;
+  max-width: 76px;
+  padding: 0 5px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 9px;
+  line-height: 1.6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-tier.owned {
+  border-color: var(--border, rgba(255, 255, 255, 0.15));
+  color: var(--text);
+  opacity: 0.6;
+}
+/* A gated row that can't be fetched: dimmed, but its ✦ stays fully lit —
+   it is the one thing on the row that does something. */
+.pt-row.locked .pt-dot,
+.pt-row.locked .pt-name,
+.pt-row.locked .pt-ver {
+  opacity: 0.5;
+}
+
+/* "Open on Patreon ↗" on a locked post's title — the one way to read it. */
+.pt-posttitle .pt-openpost {
+  margin-left: 6px;
+  padding: 0 6px;
+  font-size: 10px;
+  vertical-align: 1px;
+}

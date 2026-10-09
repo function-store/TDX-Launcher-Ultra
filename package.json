@@ -1,0 +1,48 @@
+{
+  "name": "tdxlu",
+  "private": true,
+  "version": "0.22.3",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:demo": "vite build --config vite.demo.config.ts",
+    "dev:demo": "vite --config vite.demo.config.ts",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "node scripts/fetch-fns-bootstrap.mjs && tauri build --config src-tauri/tauri.ci-artifacts.conf.json && node scripts/collect-installers.mjs",
+    "tauri:build:signed": "node scripts/fetch-fns-bootstrap.mjs && tauri build && node scripts/notarize-dmg.mjs && node scripts/collect-installers.mjs",
+    "collect-installers": "node scripts/collect-installers.mjs",
+    "set-release-host": "node scripts/set-release-host.mjs",
+    "release:build": "node scripts/release-build.mjs",
+    "release:ship": "node scripts/fetch-fns-bootstrap.mjs && node scripts/prepare-release.mjs artifacts --notes RELEASE_NOTES.md && node scripts/publish-r2.mjs --only app",
+    "release:prepare": "node scripts/fetch-fns-bootstrap.mjs && node scripts/prepare-release.mjs",
+    "release:prepare-utility": "node scripts/prepare-utility-release.mjs",
+    "release:publish": "node scripts/publish-r2.mjs",
+    "test:fuzzy": "node scripts/fuzzy-selftest.mjs",
+    "fns:bootstrap": "node scripts/fetch-fns-bootstrap.mjs"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.5.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "@crabnebula/tauri-plugin-drag": "^2.1.0",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-autostart": "^2.5.1",
+    "@tauri-apps/plugin-dialog": "^2.7.2",
+    "@tauri-apps/plugin-opener": "^2.5.4",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-updater": "^2.10.1",
+    "@types/qrcode": "^1.5.6",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0"
+  }
+}

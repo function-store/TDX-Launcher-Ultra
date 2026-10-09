@@ -1,0 +1,254 @@
+/* Quick-launch overlay window (quick.tsx). App.css is imported first for the
+   theme variables; everything here scopes under .quick-* so the app styles
+   never fight the overlay layout. */
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.quick-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.quick-input {
+  flex: none;
+  margin: 12px;
+  padding: 10px 14px;
+  font-size: 17px;
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+}
+
+.quick-input:focus {
+  border-color: var(--accent);
+}
+
+.quick-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px;
+}
+
+.quick-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.quick-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.quick-row.selected {
+  background: var(--bg-selected);
+}
+
+.quick-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-title {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-subtitle {
+  font-size: 11px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-badge {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.quick-badge.session {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.quick-badge.patreon {
+  color: var(--warn, #e0a34f);
+  border-color: var(--warn, #e0a34f);
+}
+
+/* Favourite star on tool-command rows: hollow = click to pin, filled =
+   pinned (Ctrl+D does the same for the selected row). */
+.quick-fav {
+  flex: none;
+  cursor: pointer;
+  opacity: 0.35;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 3px;
+}
+.quick-fav:hover {
+  opacity: 0.85;
+}
+.quick-fav.on {
+  opacity: 1;
+  color: var(--warn, #e0a34f);
+}
+
+/* Tool-announced commands (FNS_CommandRegistry rows). */
+.quick-badge.tool {
+  color: var(--ok, #4fb477);
+  border-color: var(--ok, #4fb477);
+}
+
+/* User-authored preset rows (alias + baked args over a tool command). */
+.quick-badge.preset {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* How many sessions offer this command (shown when more than one). */
+.quick-badge.count {
+  color: var(--accent);
+  border-color: var(--accent);
+  padding: 1px 6px;
+}
+
+/* "→ N" on a session with more than one window: says how many AND which key
+   opens them. Muted — it is a hint about a shortcut, not a status. */
+.quick-badge.wins {
+  color: var(--text-muted);
+  border-color: var(--border);
+  padding: 1px 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Declared arguments as ghost chips after the title; a chip fills solid
+   when an inline value from the query lands in it. */
+.quick-args {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 8px;
+  vertical-align: 1px;
+}
+
+.quick-arg {
+  padding: 0 6px;
+  border-radius: 4px;
+  /* An empty slot awaiting a value — visible, but quieter than filled. */
+  border: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.quick-arg.filled {
+  border-style: solid;
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* Live state chip (registry ≥ 1.6.0): the command's current value, evaluated
+ * at fetch time. ON reads active, OFF reads dormant, values ride the accent. */
+.quick-state {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
+.quick-state.on {
+  color: #7ee2a8;
+  border: 1px solid color-mix(in srgb, #7ee2a8 60%, transparent);
+  background: color-mix(in srgb, #7ee2a8 12%, transparent);
+}
+
+.quick-state.off {
+  color: var(--text-dim);
+  border: 1px solid color-mix(in srgb, var(--text-dim) 45%, transparent);
+  background: color-mix(in srgb, var(--text-dim) 8%, transparent);
+}
+
+.quick-state.val {
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.quick-footer {
+  flex: none;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-row.armed {
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+  outline: 1px solid var(--danger);
+}
+
+.quick-badge.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.quick-status.armed {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.quick-group-header {
+  position: sticky;
+  top: 0;
+  padding: 6px 10px 3px;
+  background: var(--bg);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}

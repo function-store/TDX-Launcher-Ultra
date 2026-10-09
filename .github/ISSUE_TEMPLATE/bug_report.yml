@@ -1,0 +1,69 @@
+name: Bug report
+description: Something in TDX Launcher Ultra doesn't work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please update first (Help ▾ → About & updates → Check for updates) — the bug may already be fixed.
+
+  - type: input
+    id: version
+    attributes:
+      label: Launcher version
+      description: Help ▾ → About & updates
+      placeholder: "0.22.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS (Apple Silicon)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: td
+    attributes:
+      label: TouchDesigner build
+      description: If the problem involves a project or a running session
+      placeholder: "2025.30060"
+
+  - type: input
+    id: companion
+    attributes:
+      label: Companion version
+      description: If a running session is involved — Help ▾ → About & updates shows "Utility TOX"
+      placeholder: "0.23.7"
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: And what you expected to happen instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+        3. …
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Log file
+      description: |
+        Drag the log file in here.
+        macOS: `~/Library/Logs/xyz.functionstore.tdxlu/tdxlu.log`
+        Windows: `%LOCALAPPDATA%\xyz.functionstore.tdxlu\logs\tdxlu.log`

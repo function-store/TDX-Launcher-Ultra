@@ -1,0 +1,111 @@
+# Windows-only cache warmer, plus an optional manual smoke build.
+#
+# The push trigger exists for ONE reason: release.yml only runs on version
+# tags, and GitHub Actions scopes caches to the triggering ref — a cache is
+# only visible to later runs on that exact ref, except caches saved on the
+# default branch (master), which every ref (tags included) can fall back to.
+# Since each release tag is a brand-new ref used exactly once, every tagged
+# release build was starting from a 100% cold Rust cache (confirmed: v0.6.0's
+# Windows build took 21 minutes just compiling, on "No cache found"). This job
+# keeps a matching master-branch cache warm (key: x86_64-pc-windows-msvc,
+# same as release.yml's Windows leg) so release builds restore it instead.
+# Path-filtered so it only runs when Rust-relevant files actually changed —
+# most pushes cost nothing.
+#
+# macOS stays manual-only (workflow_dispatch, include_macos) — it's not part
+# of this fix and runners bill at 10x, so it isn't worth auto-running just
+# for a smoke check. Run this manually before a risky merge if you want one.
+name: Build installers
+
+# Manual-only since 2026-09-08. This job existed to keep the Windows
+# dependency cache warm for release.yml's Windows leg; releases are now built
+# on local machines (docs/releases-local.md), so an automatic run on push only
+# spends minutes. The pre-push hook (.githooks/pre-push) runs cargo test +
+# clippy + tsc locally instead. Dispatch it by hand when a cloud smoke build
+# is deliberately wanted.
+on:
+  workflow_dispatch:
+    inputs:
+      include_macos:
+        description: Also build macOS (10x minute cost)
+        type: boolean
+        default: false
+
+concurrency:
+  group: build-installers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # key MUST match release.yml's Windows leg (x86_64-pc-windows-msvc) --
+      # that's what lets a tag-triggered release build restore this cache.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: x86_64-pc-windows-msvc
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Runs tsc + vite (beforeBuildCommand), bundles installers, then
+      # collect-installers.mjs copies them into ./installers/. Uses the
+      # no-updater-artifacts overlay so no signing key is needed here —
+      # signed updater artifacts come from the tag-triggered release job.
+      - name: Build Tauri app
+        run: npm run tauri:build
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.name }}
+          path: installers/
+          if-no-files-found: error
+
+  # Opt-in only (include_macos=true) — macOS runners bill at 10x minutes,
+  # see the top-of-file note.
+  build-macos:
+    if: inputs.include_macos
+    runs-on: macos-latest # arm64; add macos-15-intel here for an Intel build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tauri app
+        run: npm run tauri:build
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-macos
+          path: installers/
+          if-no-files-found: error

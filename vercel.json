@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build:demo",
+  "outputDirectory": "website",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- website demo src public package.json package-lock.json vite.demo.config.ts vercel.json"
+}

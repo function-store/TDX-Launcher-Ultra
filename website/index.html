@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="/favicon.png" type="image/png" />
+<link rel="apple-touch-icon" href="/favicon.png" />
+<title>TDX Launcher Ultra — TouchDesigner project launcher</title>
+<meta name="description" content="Open every TouchDesigner .toe in the build it was saved with, and get the missing TD version downloaded and installed for you. Browse projects, manage running sessions and components. Free for Windows and macOS." />
+<meta property="og:title" content="TDX Launcher Ultra — TouchDesigner project launcher" />
+<meta property="og:description" content="Open every .toe in the TouchDesigner build it was saved with. Projects, running sessions and components in one desktop launcher. Windows and macOS. Free." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TDX Launcher Ultra" />
+<meta property="og:url" content="https://launcher.functionstore.tools/" />
+<meta property="og:image" content="https://launcher.functionstore.tools/og.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="TDX Launcher Ultra showing a project gallery and the TouchDesigner build each project needs" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://launcher.functionstore.tools/" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TDX Launcher Ultra",
+  "alternateName": "TDXLU",
+  "description": "A desktop launcher for TouchDesigner projects: opens each .toe in the build it was saved with, installs missing builds, and manages running sessions and components.",
+  "url": "https://launcher.functionstore.tools/",
+  "image": "https://launcher.functionstore.tools/og.jpg",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Windows 10+, macOS (Apple Silicon)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Organization", "name": "Function Store", "url": "https://functionstore.xyz" }
+}
+</script>
+<link rel="stylesheet" href="/site-nav.css">
+<style>
+  :root {
+    --bg: #1a1a1e;
+    --bg-1: #1e1e24;
+    --bg-2: #222228;
+    --bg-3: #2a2a32;
+    --border: #33333c;
+    --border-strong: #52525e;
+    --text: #e8e8ec;
+    --text-dim: #b0b0bc;
+    --text-faint: #9696a3;
+    --accent: #32ff00;
+    --accent-dim: #1e4a1e;
+    --accent-bright: #c8ffc8;
+    --alt: #64a0ff;
+    --alt-dim: #16222f;
+    --max-w: 1140px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  /* Offset in-page anchor jumps so the sticky header doesn't cover the target. */
+  html { scroll-padding-top: 84px; scroll-behavior: smooth; }
+  :target { scroll-margin-top: 84px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "SF Pro Text", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-bright); }
+  code, kbd { font-family: "Cascadia Code", "SF Mono", Consolas, ui-monospace, monospace; font-size: 0.92em; }
+
+  .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+  /* ───── Header ───── */
+  header.site {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; max-width: var(--max-w); margin: 0 auto;
+  }
+  nav.site-nav { display: flex; gap: 28px; align-items: center; font-size: 14px; }
+  /* :not(.btn) keeps these from overriding the .btn-primary / .btn-secondary
+     color rules below. */
+  nav.site-nav a:not(.btn) { color: var(--text-dim); }
+  nav.site-nav a:not(.btn):hover { color: var(--text); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px; border-radius: 3px;
+    font-weight: 600; font-size: 14px;
+    border: 1px solid transparent; cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent-dim); border-color: #2d7a2d; color: var(--accent-bright); }
+  .btn-primary:hover { background: #265826; border-color: var(--accent); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--text); border-color: var(--border-strong); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-lg { padding: 11px 18px; font-size: 14px; }
+
+  /* ───── Hero ───── */
+  .hero { padding: 64px 0 24px; text-align: left; position: relative; overflow: hidden; }
+
+  .hero-inner { position: relative; }
+  .eyebrow {
+    display: inline-block;
+    padding: 0;
+    color: var(--text-dim);
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+    margin-bottom: 20px;
+  }
+  h1.hero-title {
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    margin: 0 0 20px;
+    color: var(--text);
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 60ch;
+    margin: 0 0 28px;
+  }
+  .hero-cta { display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; }
+  .hero-meta {
+    list-style: none;
+    margin: 24px 0 0;
+    padding: 0;
+    max-width: 640px;
+    font-size: 13px;
+    color: var(--text-faint);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 6px 0;
+  }
+  .hero-meta li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .hero-meta li:not(:last-child)::after {
+    content: '·';
+    margin: 0 12px;
+    color: var(--text-faint);
+  }
+  .hero-meta a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .hero-meta a:hover { color: var(--accent-bright); text-decoration: underline; }
+  .hero-shot {
+    margin: 40px auto 0;
+    max-width: none;
+  }
+  .hero-shot img,
+  .hero-shot video {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    box-shadow: none;
+  }
+  .hero-shot figcaption {
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+  @media (max-width: 600px) {
+    .hero-meta { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .hero-meta li:not(:last-child)::after { content: none; margin: 0; }
+  }
+
+  /* ───── Section ───── */
+  section { padding: 36px 0; }
+  .section-head { text-align: left; margin-bottom: 36px; }
+  .section-head h2 {
+    font-size: clamp(24px, 2.6vw, 30px);
+    font-weight: 700; letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+  .section-head p {
+    color: var(--text-dim); font-size: 17px;
+    max-width: 760px; margin: 0;
+  }
+
+  /* ───── Quick start ───── */
+  .quickstart {
+    background: transparent; border-top: 1px solid var(--border);
+    border-radius: 0; padding: 32px 0;
+    display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .quickstart { grid-template-columns: 1fr; padding: 28px; } }
+  .quickstart h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 16px; }
+  .quickstart p { color: var(--text-dim); font-size: 15px; margin: 0 0 20px; }
+  .quickstart ol { padding-left: 20px; color: var(--text-dim); font-size: 14px; line-height: 1.7; margin: 0; }
+  .quickstart ol li { margin-bottom: 8px; }
+  .quickstart ol strong { color: var(--text); }
+  .tabs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-dim);
+  }
+  .tabs-list li {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+  }
+  .tabs-list li:first-child { border-top: none; padding-top: 0; }
+  .tabs-list strong {
+    flex: 0 0 6.5em;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .tabs-list .tag {
+    display: inline-block; font-size: 10px;
+    padding: 1px 7px; border-radius: 999px;
+    background: var(--alt-dim); color: var(--alt);
+    border: 1px solid rgba(100,160,255,0.3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+  .tabs-head {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-faint);
+    margin: 0 0 14px;
+  }
+
+  /* ───── Companion callout ───── */
+  .companion-callout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 28px;
+    padding: 28px 32px;
+    background: var(--bg-1);
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    border-radius: 4px;
+  }
+  .companion-callout__eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .companion-callout h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .companion-callout p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.55;
+    max-width: 58ch;
+  }
+  .companion-callout__side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .companion-callout__node {
+    display: block;
+    width: 180px;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  }
+  .companion-callout__hint {
+    font-size: 12px;
+    color: var(--text-faint);
+    max-width: 24ch;
+    line-height: 1.4;
+    text-align: center;
+    margin: 0;
+  }
+  @media (max-width: 700px) {
+    .companion-callout { padding: 22px 20px; justify-content: center; }
+  }
+
+  /* ───── Quick-launch spotlight ───── */
+  .ql-grid {
+    display: grid; grid-template-columns: 1fr 1.1fr;
+    gap: 48px; align-items: center;
+  }
+  @media (max-width: 860px) { .ql-grid { grid-template-columns: 1fr; gap: 28px; } }
+  .ql-copy .eyebrow { margin-bottom: 16px; }
+  .ql-copy h2 {
+    font-size: clamp(24px, 2.6vw, 30px);
+    font-weight: 700; letter-spacing: -0.02em;
+    margin: 0 0 14px;
+  }
+  .ql-copy p { color: var(--text-dim); font-size: 15px; line-height: 1.6; margin: 0 0 14px; }
+  .ql-copy p strong { color: var(--text); }
+  .ql-tokens { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 8px; }
+  .ql-tokens li { display: flex; gap: 10px; align-items: baseline; font-size: 14px; color: var(--text-dim); }
+  .ql-tokens code {
+    flex: none; min-width: 2.2em; text-align: center;
+    font-size: 13px; padding: 2px 6px;
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--accent);
+  }
+  /* The fake screenshot: the overlay recreated in HTML, floating over a
+     TD-dark backdrop. Decorative only — hidden from the accessibility tree. */
+  .ql-stage {
+    position: relative;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    padding: 36px 28px;
+    background: var(--bg-1);
+    overflow: hidden;
+  }
+  /* Faint network-editor grid, like TD behind the overlay. */
+  .ql-stage::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .ql-mock {
+    position: relative;
+    max-width: 460px; margin: 0 auto;
+    background: #101010;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,0,0,0.4);
+    font-size: 14px;
+    overflow: hidden;
+  }
+  .ql-mock-input {
+    margin: 12px; padding: 10px 14px;
+    font-size: 16px;
+    background: #181818;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    color: var(--text);
+    display: flex; align-items: center;
+  }
+  .ql-caret {
+    display: inline-block; width: 1.5px; height: 1.05em;
+    background: var(--accent); margin-left: 2px;
+    animation: ql-blink 1.1s steps(1) infinite;
+  }
+  @keyframes ql-blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .ql-caret { animation: none; } }
+  .ql-rows { padding: 0 12px 6px; }
+  .ql-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 8px;
+  }
+  .ql-row.selected { background: rgba(255,255,255,0.07); }
+  .ql-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .ql-row-title { font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ql-row-sub { font-size: 11px; color: var(--text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ql-badge {
+    flex: none; padding: 1px 8px; border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    font-size: 9px; font-weight: 700; letter-spacing: 0.05em;
+    color: var(--text-dim); text-transform: uppercase;
+  }
+  .ql-badge.session { color: var(--accent); border-color: var(--accent); }
+  .ql-badge.danger { color: #f87171; border-color: #f87171; }
+  .ql-badge.tool { color: var(--alt); border-color: var(--alt); }
+  /* Ghost chips: a tool command's declared arguments, waiting for values. */
+  .ql-chips { display: inline-flex; gap: 5px; margin-left: 7px; vertical-align: middle; }
+  .ql-chip {
+    padding: 0 6px; border-radius: 5px;
+    border: 1px dashed var(--border-strong);
+    font-family: "Cascadia Code", "SF Mono", Consolas, ui-monospace, monospace;
+    font-size: 9.5px; font-weight: 500; color: var(--text-faint);
+  }
+  .ql-chip.filled {
+    border-style: solid; border-color: var(--alt);
+    color: var(--alt); background: var(--alt-dim);
+  }
+  .ql-mock-footer {
+    padding: 8px 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text-faint);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ql-stage-note {
+    position: relative;
+    margin: 18px auto 0; max-width: 460px;
+    text-align: center;
+    font-size: 12px; color: var(--text-faint);
+  }
+
+  /* ───── Feature catalog (categorized list, no cards) ───── */
+  .feature-cat {
+    display: grid; grid-template-columns: 220px 1fr;
+    gap: 40px; padding: 24px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 760px) {
+    .feature-cat { grid-template-columns: 1fr; gap: 16px; padding: 28px 0; }
+  }
+  .feature-cat-head h3 {
+    margin: 0 0 8px; font-size: 20px; font-weight: 600;
+    letter-spacing: -0.01em; color: var(--text);
+  }
+  .feature-cat-head p {
+    margin: 0; font-size: 13px; color: var(--text-faint);
+    line-height: 1.5;
+  }
+  .feature-cat-list {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 32px;
+  }
+  @media (max-width: 560px) { .feature-cat-list { grid-template-columns: 1fr; } }
+  .feat {
+    display: block;
+    gap: 12px; align-items: start;
+  }
+
+  .feat-text > strong {
+    display: block; font-size: 14px; font-weight: 600;
+    margin-bottom: 2px; color: var(--text);
+    letter-spacing: -0.005em;
+  }
+  /* Direct child only: the description span. A descendant selector here also
+     caught the .pro-badge nested in the <strong> and blew it up to a
+     full-width block, since .feat-text span outranks .pro-badge. */
+  .feat-text > span {
+    display: block; font-size: 13px; color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .feat-text code {
+    font-size: 12px; padding: 1px 5px;
+    background: var(--bg-2); border-radius: 4px;
+    color: var(--text-dim);
+  }
+  .feat-tag {
+    font-weight: normal; font-size: 11px; color: var(--text-faint);
+  }
+
+  /* ───── Try-first band (sits above the download cards) ───── */
+  .try-band {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 16px; text-align: center;
+    background: var(--bg-1);
+    border: 1px solid rgba(74,222,128,0.30);
+    border-radius: 4px; padding: 22px 28px; margin-bottom: 28px;
+  }
+  .try-band-text { color: var(--text-dim); font-size: 14px; line-height: 1.55; max-width: 56ch; }
+  .try-band-text strong { color: var(--text); }
+  .try-band-actions {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    justify-content: center; align-items: center;
+  }
+  @media (max-width: 640px) {
+    .try-band-actions { flex-direction: column; width: 100%; }
+    .try-band-actions .btn { width: 100%; justify-content: center; }
+  }
+
+  /* ───── Download paths ───── */
+  .paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: stretch; }
+  .paths--two { grid-template-columns: repeat(2, 1fr); max-width: 780px; margin: 0 auto; }
+  @media (max-width: 800px) { .paths, .paths--two { grid-template-columns: 1fr; } }
+  .path {
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: 4px; padding: 26px 24px;
+    display: flex; flex-direction: column;
+  }
+  .path--win { border-color: rgba(74,222,128,0.35); background: var(--bg-1); }
+  .path--mac { border-color: rgba(74,222,128,0.35); background: var(--bg-1); }
+  .path-tag {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-faint); margin-bottom: 8px;
+  }
+  .path--win .path-tag, .path--mac .path-tag { color: var(--accent); }
+  .path h3 { margin: 0 0 10px; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+  .path p { color: var(--text-dim); font-size: 14px; line-height: 1.55; margin: 0 0 20px; }
+  .path p strong { color: var(--text); }
+  .path .btn { margin-top: auto; justify-content: center; }
+  .path code { font-size: 12px; padding: 1px 5px; background: var(--bg-2); border-radius: 4px; color: var(--text-dim); }
+  .path-note {
+    margin-top: 14px !important;
+    margin-bottom: 0 !important;
+    font-size: 12px !important;
+    color: var(--text-faint) !important;
+    line-height: 1.5 !important;
+  }
+  .path-note code { display: inline-block; margin-top: 4px; padding: 3px 7px; }
+  .update-note {
+    margin: 28px auto 0;
+    max-width: 640px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-faint);
+    line-height: 1.6;
+  }
+  .update-note strong { color: var(--text-dim); }
+
+  .code-block {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: "Cascadia Code", "SF Mono", Consolas, ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    overflow-x: auto;
+    text-align: left;
+  }
+  .code-block .c { color: var(--text-faint); }
+
+  /* ───── Footer ───── */
+  footer.site {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+  }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: var(--text-faint); }
+  .footer-links a:hover { color: var(--text); }
+
+  /* ───── Tiers / Pro marking ───── */
+  .pro-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(129,140,248,0.45);
+    background: rgba(129,140,248,0.12);
+    color: #a5b4fc;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+  @media (max-width: 800px) { .tiers { grid-template-columns: 1fr; } }
+  .tier {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-2, #14161c);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .tier.pro { border-color: rgba(129,140,248,0.35); }
+  .tier-name {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+  .tier.pro .tier-name { color: #a5b4fc; }
+  .tier-title { font-size: 22px; font-weight: 650; margin: 6px 0 4px; }
+  .tier-desc { color: var(--text-dim); font-size: 15px; margin: 0 0 22px; }
+  .tier-list { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 11px; }
+  .tier-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; }
+  .tier-list .check {
+    flex: none; width: 18px; height: 18px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 11px; margin-top: 1px;
+    background: rgba(255,255,255,0.06); color: var(--text-dim);
+  }
+  .tier.pro .check { background: rgba(129,140,248,0.15); color: #a5b4fc; }
+  .tier-list li strong { color: var(--text); font-weight: 600; }
+  .tier-list li span { color: var(--text-dim); }
+  .tier-cta { margin-top: auto; display: flex; flex-wrap: wrap; gap: 10px; }
+  .tier-cta .btn { flex: 1 1 auto; justify-content: center; }
+  .tier-cta-note { flex: 1 1 100%; margin: 4px 0 0; font-size: 12.5px; color: var(--text-faint); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .ql-grid > *, .paths > *, .tiers > * { min-width: 0; }
+  .path-note code { overflow-wrap: anywhere; }
+  .footer-links { flex-wrap: wrap; gap: 12px 24px; }
+  .section-head-meta { margin-top: 20px !important; font-size: 14px !important; }
+  .tier, .tier.pro, .path--win, .path--mac, .companion-callout { border-color: var(--border-strong); }
+  .pro-badge { background: transparent; border: 0; border-radius: 0; padding: 0; color: var(--text-dim); }
+  .tier.pro .tier-name { color: var(--text); }
+  .tier-list .check, .tier.pro .check { background: transparent; color: var(--text-dim); }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  /* Use the desktop app's palette, fine dividers and compact controls. */
+  .hero .eyebrow { font-family: "Cascadia Code", Consolas, monospace; color: var(--accent); letter-spacing: 0; }
+  .site-inner { padding-top: 12px; padding-bottom: 12px; }
+  .hero { padding-top: 48px; }
+  .hero-shot { margin-top: 32px; }
+  .hero-shot video { border-radius: 0; }
+  .hero-shot figcaption { font-size: 12px; max-width: 85ch; }
+  .section-head { margin-bottom: 24px; }
+  .section-head h2, .ql-copy h2 { font-weight: 600; }
+  .section-head p { font-size: 15px; }
+  .companion-callout { padding: 28px; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; background: var(--bg-2); align-items: flex-start; }
+  .companion-callout > div:first-child { flex: 1 1 380px; }
+  .companion-callout__node { width: 140px; border: 0; border-radius: 0; box-shadow: none; }
+  .companion-callout__hint { max-width: 28ch; text-align: left; }
+  .companion-callout__side { align-items: flex-start; }
+  .companion-callout__eyebrow, .tabs-head, .path-tag, .tier-name { text-transform: none; letter-spacing: 0; font-family: "Cascadia Code", Consolas, monospace; font-size: 12px; }
+  .ql-stage { padding: 28px 20px; border: 1px solid var(--border); border-radius: 6px; background: #141418; }
+  .ql-stage::before { content: none; }
+  .ql-mock { border-radius: 6px; box-shadow: none; background: var(--bg-1); }
+  .ql-stage-note { text-align: left; }
+  .feat-text > span { font-size: 14px; }
+  .feature-cat-head h3 { font-size: 20px; padding: 12px 14px; background: var(--bg-2); border-bottom: 2px solid var(--accent); border-radius: 4px 4px 0 0; margin-bottom: 16px; }
+  .feature-cat-head h3::before { content: none; }
+  .feature-cat { padding: 36px 0; }
+  .feature-cat-head p { font-size: 14px; max-width: 28ch; }
+  .feat { min-width: 0; padding: 18px 20px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px; }
+  .feat-text > strong { font-size: 16px; margin-bottom: 10px; }
+  .feat-icon { display: inline-block; vertical-align: -3px; margin-right: 9px; color: var(--accent-bright); flex: none; }
+  .feat-text > span { line-height: 1.6; }
+  .feat-text > span strong { font-weight: 600; color: var(--text); }
+  .feat-text code { overflow-wrap: anywhere; }
+  .feature-cat-list { gap: 14px; }
+  .tiers, .paths { gap: 20px; }
+  .tier, .tier.pro, .path, .path--win, .path--mac { padding: 24px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-1); }
+  .tier-title { font-size: 23px; font-weight: 600; }
+  .tier-list { gap: 9px; }
+  .tier-list .check { display: none; }
+  .tier-list li { padding-bottom: 9px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .tier-cta .btn { flex: 0 1 auto; }
+  .paths--two { max-width: none; }
+  .path .btn { align-self: flex-start; }
+  .update-note { max-width: none; text-align: left; }
+  .quickstart { padding-bottom: 0; }
+  @media (max-width: 800px) {
+    .quickstart { padding: 24px 0 0; }
+    .tiers, .paths { gap: 28px; }
+  }
+  @media (max-width: 600px) {
+    .hero { padding-top: 32px; }
+    .wrap { padding-left: 20px; padding-right: 20px; }
+    .hero-meta { gap: 4px; }
+    .companion-callout { gap: 24px; padding: 20px; }
+    .companion-callout__side { flex-direction: row; align-items: center; flex-shrink: 1; }
+    .companion-callout__node { width: 100px; }
+    .hero-cta .btn { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="site-inner">
+    <div class="brand">
+      <img class="brand-logo" src="/favicon.png" alt="" width="28" height="28" decoding="async" />
+      <div class="brand-lockup">
+        <a href="/" class="brand-name">TDX Launcher Ultra</a>
+        <span class="brand-credit">by <a href="https://functionstore.xyz/link-in-bio" target="_blank" rel="noopener noreferrer">Function Store</a></span>
+      </div>
+    </div>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+    </button>
+    <nav id="site-nav" class="site-nav">
+      <a href="#quickstart">Quick start</a>
+      <a href="#features">Features</a>
+      <a href="/docs/">Docs</a>
+      <a href="/demo/">In your browser</a>
+      <a href="https://patreon.com/function_store" target="_blank" rel="noopener">Patreon</a>
+      <a class="btn btn-primary" href="#download">Download free →</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ───── Hero ───── -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <span class="eyebrow">TDX Launcher Ultra</span>
+      <h1 class="hero-title">A project launcher<br/>for TouchDesigner</h1>
+      <p class="hero-sub">
+        Browse your <code>.toe</code> files and open them in the TouchDesigner build they were saved with. Keep track of running sessions, find components, and save or restart a project from the same window.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#download">Download free →</a>
+        <a class="btn btn-secondary btn-lg" href="/demo/">Look around in your browser →</a>
+      </div>
+      <ul class="hero-meta">
+        <li>Free · no account</li>
+        <li>Windows &amp; macOS</li>
+      </ul>
+      <figure class="hero-shot">
+        <video
+          id="hero-video"
+          src="/hero.mp4"
+          poster="/hero-poster.jpg"
+          width="1280" height="800"
+          autoplay muted loop playsinline
+          preload="metadata"
+          aria-label="TDXLU driving mock projects — gallery previews playing on hover, live sessions, the palette"
+        ></video>
+        <figcaption>Project gallery, running sessions and component palette. Demo data; the TouchDesigner window is a mockup. <a href="/demo/">Explore the app in your browser.</a></figcaption>
+      </figure>
+      <script>
+        // Respect reduced-motion: hold the poster instead of auto-playing.
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          const v = document.getElementById('hero-video');
+          v.removeAttribute('autoplay'); v.pause();
+        }
+      </script>
+    </div>
+  </section>
+
+  <!-- ───── Quick start ───── -->
+  <section id="quickstart">
+    <div class="wrap">
+      <div class="quickstart">
+        <div>
+          <h2>Start with your recent projects</h2>
+          <p>The Recent tab reads TouchDesigner's recent list and adds anything you open through the launcher.</p>
+          <ol>
+            <li><strong>Install</strong> — grab the installer for your platform <a href="#download">below</a></li>
+            <li><strong>Set it up</strong> — the wizard covers <code>.toe</code> file association, the companion TOX and tray behavior. Reopen it from <strong>Help</strong> anytime</li>
+            <li><strong>Pick a project</strong> — see the TD build recorded in the file</li>
+            <li><strong>Missing that build?</strong> TDXLU offers the matching Derivative download and runs the installer for you</li>
+            <li><strong>Launch</strong> — or just double-click <code>.toe</code> files in your file manager once the association is set</li>
+          </ol>
+        </div>
+        <div>
+          <p class="tabs-head">The tabs</p>
+          <ul class="tabs-list">
+            <li><strong>Recent</strong><span>Merged TD + launcher recents; version panel, tags, per-project README, media browser</span></li>
+            <li><strong>Current</strong><span>TouchDesigner sessions running right now — including ones opened outside the launcher</span></li>
+            <li><strong>Templates</strong><span>Starter <code>.toe</code> files, reorderable, with a default TD version for the whole tab</span></li>
+            <li><strong>Palette</strong><span>Derivative palette + custom folders, with a pinned favorites Toolbox on top; drag straight into TD</span></li>
+            <li><strong>Patreon</strong><span>Browse <code>.tox</code> components from creators you back or merely follow, and load one into a running session</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── Companion callout ───── -->
+  <section id="companion" aria-labelledby="companion-title" style="padding-top: 0;">
+    <div class="wrap">
+      <div class="companion-callout">
+        <div>
+          <span class="companion-callout__eyebrow">Companion TOX</span>
+          <h2 id="companion-title">Drive the running session from the launcher</h2>
+          <p>
+            Add the bundled <code>.tox</code> to your project to save from the launcher, capture thumbnails and preview clips, and load components into the running network.
+          </p>
+          <p style="margin-top: 10px;">
+            Include it in your TouchDesigner startup file for new projects. For existing projects, drag it in once. The Companion bar has instructions for both.
+          </p>
+        </div>
+        <figure class="companion-callout__side" style="margin: 0;">
+          <img class="companion-callout__node" src="/companion-node.png" width="420" height="406"
+               alt="The TDXLauncherUtility component as it appears in a TouchDesigner network" loading="lazy" decoding="async" />
+          <figcaption class="companion-callout__hint">This node in your project's root network is the whole install. Bundled with the installer — one click in the setup wizard puts it in your palette.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── Quick-launch spotlight ───── -->
+  <section id="quicklaunch" aria-labelledby="quicklaunch-title">
+    <div class="wrap">
+      <div class="ql-grid">
+        <div class="ql-copy">
+          <span class="eyebrow">QUICK LAUNCH</span>
+          <h2 id="quicklaunch-title">Find a project without switching windows</h2>
+          <p>
+            Press the global hotkey — TD fullscreen included — and a small search box appears over
+            whatever you're doing. Type a few letters, hit <strong>Enter</strong>: projects launch with
+            the right build, running sessions focus, components place into the live session — or drag
+            the row straight into a TouchDesigner network.
+          </p>
+          <ul class="ql-tokens">
+            <li><code>&gt;</code><span>verb-first commands per session — Focus, Save, Thumbnail, Preview video, Relaunch, Kill. Destructive ones arm on the first Enter and fire on the second, never on one keypress.</span></li>
+            <li><code>?</code><span>tool commands — actions the components inside a running project publish for themselves. Type the arguments inline: <code>? rec 2</code> and it's already recording.</span></li>
+            <li><code>=</code><span>components only — your whole <code>.tox</code> library in one list.</span></li>
+            <li><code>/</code><span>browse a palette folder, Toolbox category or your Patreon cache.</span></li>
+            <li><code>#</code><span>filter by project tag — running sessions keep their tags, so a live show still surfaces.</span></li>
+          </ul>
+          <p style="font-size: 14px; color: var(--text-faint); margin-top: -4px;">
+            Press <kbd>Alt+↑</kbd> to recall a previous query.
+          </p>
+          <div class="hero-cta" style="justify-content: flex-start;">
+            <a class="btn btn-secondary" href="/demo/quick.html">Try it in the browser demo →</a>
+          </div>
+        </div>
+        <div>
+          <div class="ql-stage">
+            <div class="ql-mock" aria-hidden="true">
+              <div class="ql-mock-input">aur<span class="ql-caret"></span></div>
+              <div class="ql-rows">
+                <div class="ql-row selected">
+                  <div class="ql-row-main">
+                    <span class="ql-row-title">AuroraSet</span>
+                    <span class="ql-row-sub">running · 2025.30060 · pid 18244 — Enter focuses</span>
+                  </div>
+                  <span class="ql-badge session">session</span>
+                </div>
+                <div class="ql-row">
+                  <div class="ql-row-main">
+                    <span class="ql-row-title">AudioReactive</span>
+                    <span class="ql-row-sub">Projects/AudioReactive · rnd audio</span>
+                  </div>
+                  <span class="ql-badge">project</span>
+                </div>
+                <div class="ql-row">
+                  <div class="ql-row-main">
+                    <span class="ql-row-title">AudioReactive_Starter</span>
+                    <span class="ql-row-sub">Templates</span>
+                  </div>
+                  <span class="ql-badge">template</span>
+                </div>
+                <div class="ql-row">
+                  <div class="ql-row-main">
+                    <span class="ql-row-title">Audio · Set BPM<span class="ql-chips"><span class="ql-chip filled">bpm 128</span><span class="ql-chip">resync</span></span></span>
+                    <span class="ql-row-sub">Set the project tempo · 2 sessions</span>
+                  </div>
+                  <span class="ql-badge tool">tool</span>
+                </div>
+                <div class="ql-row">
+                  <div class="ql-row-main">
+                    <span class="ql-row-title">Kill AuroraSet</span>
+                    <span class="ql-row-sub">Terminate the TD process</span>
+                  </div>
+                  <span class="ql-badge danger">command</span>
+                </div>
+              </div>
+              <div class="ql-mock-footer">↵ focus session · &gt; commands · ? tools · alt+↑ history · esc close</div>
+            </div>
+            <p class="ql-stage-note">Recreated for this page — the real overlay is one click away in the <a href="/demo/quick.html">browser demo</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── Features ───── -->
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Features</h2>
+        <p>All of it free — no account, no licence key.</p>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Launching</h3>
+          <p>Find the project, get the build it needs, go.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Merged recents</strong><span>TD's own recent list and the launcher's history in one place — nothing to import.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 15l6 6 M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0"/></svg>Build detection</strong><span>Reads the exact TD build a <code>.toe</code> was saved with, straight from the file.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12 m-5-5 5 5 5-5 M4 16v5h16v-5"/></svg>Version install</strong><span>If the required build isn't installed, offers the matching Derivative download and runs the installer.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg>Gallery &amp; list views</strong><span>Icon/hero grid by default — tiles with a preview clip play it on hover. Classic list one toggle away.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h7l2 3h9v11H3z M3 6V4h7l2 2"/></svg>Templates</strong><span>Starter <code>.toe</code> files, reorderable, with a default TD version for the whole tab.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg><code>.toe</code> association</strong><span>Double-click a project in your file manager and it routes through the launcher — with a countdown any key cancels.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 15l6 6 M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0"/></svg>Missing-build fallback</strong><span>A double-clicked project whose exact build you don't have doesn't dead-end: choose once — latest, closest, a build you pin, or always ask — and it's remembered.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Quick launch</h3>
+          <p>A hotkey palette over everything — TD fullscreen included. <a href="/demo/quick.html">Try it in the browser demo →</a></p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 6 6 6-6 6 M13 18h7"/></svg>Summon anywhere</strong><span>The main global hotkey raises the launcher window from anywhere; a second opens this small search box over whatever you're doing — type a few letters, hit Enter. A third raises the main window on the Palette tab; bind whichever combos you want, each on or off on its own.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Everything in one list</strong><span>Projects launch with the right build, running sessions focus, palette / Toolbox / Patreon components place into the live session, templates start new projects.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 6 6 6-6 6 M13 18h7"/></svg>Commands</strong><span><code>&gt;</code> shows verb-first commands per session — Focus, Save, Thumbnail, Preview video, Relaunch, Kill, plus a new project from your default template. Destructive ones always ask for a second Enter.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 6 6 6-6 6 M13 18h7"/></svg>Tool commands</strong><span>Components in a running project publish their own actions — <code>?</code> lists them. Arguments render as chips and can be typed inline (<code>? rec 2</code>) or filled through a short prompt. Same command in several sessions? One row with a count, run against the session you were just in.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 6 6 6-6 6 M13 18h7"/></svg>Query history</strong><span>Executed queries are remembered and cycle with <kbd>Alt+↑</kbd> / <kbd>Alt+↓</kbd>, shell style — the thing you run before every show is two keystrokes away.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 15l6 6 M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0"/></svg>Field filters</strong><span><code>/folder</code> browses a palette folder, Toolbox category or your Patreon cache, grouped under headers; <code>#tag</code> filters by project tag — mixed freely with search words.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 15 6-6 M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0 M16 8l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/></svg>Drag out</strong><span>Any <code>.tox</code> row drags straight into a TouchDesigner network — the palette waits for the drop, then gets out of the way.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Phone Remote</h3>
+          <p>Access running sessions from a phone on the same Wi-Fi. <a href="/demo/control.html">Try it in the browser demo →</a></p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 2h10v20H7z M10 18h4"/></svg>One-tap pairing</strong><span>Tap 📱, scan a QR, done — LAN access flips on and the remote opens on your phone (same Wi-Fi). Add it to the home screen; the pairing survives restarts.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg>Sessions as tabs</strong><span>Every session — live or ended — is a tab: facts, heartbeat status, live perf readout, and Focus / Relaunch / Kill / Dismiss. Ended sessions relaunch with one tap.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Hold-to-confirm</strong><span>Kill and Relaunch arm on press-and-hold with a filling bar and a haptic buzz — release early to cancel. Nothing destructive fires from a stray tap.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Straight into a session <span class="pro-badge">Soon</span></strong><span>A session running <a href="#fnstools"><code>FNS_Remote</code></a> gets an <strong>Open remote</strong> button on its tab: one tap and you are on that session's own page, served by TouchDesigner itself. Exposed parameters, the touch pad and save live there — so they keep working with the launcher closed.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 2h10v20H7z M10 18h4"/></svg>Multi-touch surface <span class="pro-badge">Soon</span></strong><span>Every finger as CHOP channels — x, y, force and active per slot, plus touch count and a connected-phone table — comes from <a href="#fnstools"><code>FNS_Remote</code></a>, which serves the phone from inside TouchDesigner. Several phones at once, and it runs with the launcher closed.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 2h10v20H7z M10 18h4"/></svg>Client link <span class="pro-badge">Soon</span></strong><span>Hand a client or operator the reduced page: only the controls you exposed — no session actions, no launching, no browsing. Enforced by the server, not hidden in the page. It is <a href="#fnstools"><code>FNS_Remote</code></a>'s own link, and the fleet page hands it out per session.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Yours to run</strong><span>Start, stop, change the port (rebinds live), or regenerate the pairing code to cut off every shared link — all from Settings.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Projects &amp; metadata</h3>
+          <p>Everything the launcher knows lives next to the .toe — no database.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Project versions</strong><span><code>Name.2.toe</code> increments, <code>Backup/</code> saves and crash autosaves fold into one card. A versions drawer launches any copy, restores one as the head (the old head is preserved, never overwritten), or prunes to the recycle bin.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Tags</strong><span>Hierarchical with <code>/</code> (e.g. <code>show/live</code>); filter and edit from the toolbar.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Per-project README</strong><span>Shown and edited in-app — notes travel with the project.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Project media</strong><span>Auto-scans a media folder beside the <code>.toe</code>; fullscreen browse, videos stream on hover.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Sidecar metadata</strong><span>One <code>{stem}.tdxlu.json</code> per project — title, description, tags, hero image. Plain JSON, yours to edit.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Running sessions</h3>
+          <p>Inspect and control running TouchDesigner processes.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Session discovery</strong><span>Finds every running TD process — including projects opened outside the launcher. Shows version, PID, uptime.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Session control</strong><span>Focus the TD window, reveal the <code>.toe</code>, relaunch with a different version, or kill the process.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Status at a glance</strong><span>A dot on every session: running, not responding (its companion stopped pulsing, so TD is frozen or busy), or ended. Ended sessions wait below an Ended divider and relaunch in one click.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Heartbeat watchdog</strong><span>Tray watchdog on TCP pulses from the companion; multi-project, SMTP alerts on stall or relaunch.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Displays &amp; GPU</strong><span>Multi-GPU machines: bind a project's TD process to one card at launch, and place its windows on the right displays through the companion. Both saved with the project.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Tray &amp; login</strong><span>Close-to-tray, quit-after-launch, start at login (minimized to the tray) — all Settings toggles.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Companion actions</h3>
+          <p>What the companion TOX unlocks on a selected running session — plus whatever your installed <a href="#fnstools">FNSTools</a> packages add to it.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Save, thumbnail, preview video</strong><span>Save the <code>.toe</code> in place; capture a thumbnail or a preview clip (up to 30s) — the gallery picks them up automatically.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Autosave, via FNS_Autosave</strong><span>TouchDesigner has none — the free <a href="#fnstools">FNSTools</a> package <code>FNS_Autosave</code> adds one. Arm a timer inside the session, pick whether a save follows your increment/backup preferences or overwrites the open <code>.toe</code>, and skip saves when nothing changed or while you're in Perform Mode. Install it and it appears in the session view; it also runs with the launcher closed.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12 m-5-5 5 5 5-5 M4 16v5h16v-5"/></svg>Collect, via FNS_Collect <span class="pro-badge">Soon</span></strong><span>Scan for external media refs, copy them into the project, relink relative — dry-run checklist first, per-file opt-out, expression refs frozen to constant paths (or not, your call). An <a href="#fnstools">FNSTools</a> package: install <code>FNS_Collect</code> and it appears in the session view. Works standalone inside TD, no launcher needed.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Media browser, via FNS_MediaBrowser <span class="pro-badge">Soon</span></strong><span>Every movie, image, audio and geometry file the running project references — live preview, file facts (resolution, duration, fps, audio), Replace on any reference, <strong>Locate missing</strong> to batch-relink a moved folder, an <strong>Unused</strong> scan for dead weight, and timeline sync to a clip. An <a href="#fnstools">FNSTools</a> package (<code>FNS_MediaBrowser</code>) with its own panel inside TD.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 15 6-6 M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0 M16 8l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/></svg>Load components</strong><span>Send a <code>.tox</code> into the network editor — from a local file, any URL, a GitHub release, or a package index.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Python env</strong><span>Package installs go into the project's <code>.venv</code>, with <code>uv</code> when it's on the machine and the env's own pip otherwise; <strong>Set up Python env</strong> creates one via <code>TDPyEnvManager</code> in one click.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12 m-5-5 5 5 5-5 M4 16v5h16v-5"/></svg>In-place utility updates</strong><span>When a session runs an older companion, one click updates it live — parameter values survive the reload.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 15 6-6 M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0 M16 8l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/></svg>Embody / Envoy aware</strong><span>Projects built with the optional Embody/Envoy toolkit get an Envoy panel — bridge status, <code>.mcp.json</code>, port — and a last-resort transport for companion actions. Never required.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Palette &amp; Toolbox</h3>
+          <p>Your components, one drag from any network.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h7l2 3h9v11H3z M3 6V4h7l2 2"/></svg>Palette browser</strong><span><code>Documents/Derivative/Palette</code> plus any custom folders — drag a <code>.tox</code> straight into a TD network.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg>Toolbox</strong><span>A pinned favorites shelf in categories you define. Lives in the launcher config, so it's the same set no matter which folders are scanned.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Tools from anywhere</strong><span>Pin local paths, direct URLs, or <code>owner/repo</code> GitHub releases — ⟳ re-fetches, so a GitHub tool tracks its latest release. Package specs too.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Load into session</strong><span>A target bar names the running session with the companion — send any <code>.tox</code> into its network editor without dragging.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 15 6-6 M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0 M16 8l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/></svg>Drop to pin</strong><span>Drop a <code>.tox</code> from Explorer or the palette tree onto the Toolbox — onto a category row to pin it there.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat" id="fnstools">
+        <div class="feature-cat-head">
+          <h3>FNSTools</h3>
+          <p>The FNSTools toolkit, browsable and installable without leaving the launcher — and where the launcher’s optional capabilities come from. Its Plus packages come with a <a href="https://www.patreon.com/function_store/join" target="_blank" rel="noopener">Patreon membership</a>. <a href="https://tools.functionstore.xyz" target="_blank" rel="noopener">About the toolkit →</a></p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Launcher capabilities</strong><span>Some packages announce their commands to the running session, and the launcher renders them right in the Sessions view and its context menu — <code>FNS_Autosave</code> (free) brings autosave today; <code>FNS_Collect</code>, <code>FNS_MediaBrowser</code> and <code>FNS_Remote</code> — collect, the media browser and phone control — are coming soon. Each is a complete TouchDesigner tool in its own right: it works with the launcher closed, and lights up the session view when both are installed.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>The store</strong><span>The current release by category, with descriptions, versions and docs links. What a session already has is pre-checked, with <code>installed</code> and <code>1.1.0 → 1.2.0</code> badges.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 2h10v20H7z M10 18h4"/></svg>Install without TouchDesigner</strong><span>Tick tools and stock them locally — verified downloads, no session needed. Or install straight into a running project over the companion bus, bootstrap included if the project has no toolkit yet.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>The selection is the tool set</strong><span>Installing makes the project match what you ticked, so unticking removes. The confirm step lists the adds <em>and</em> the removals before anything happens.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16 M4 12h16 M4 18h16 M8 3v6 M16 9v6 M10 15v6"/></svg>Global configurator</strong><span>Every tool's settings, edited from the launcher — with real menus, ranges and validation when a session is live, or straight into the config file when nothing is running.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg>Palette shelf</strong><span>Every package also appears as a standalone component beside the Toolbox — drag one into a network, or place it into a session.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Palette tabs inside TouchDesigner</h3>
+          <p>The launcher's Palette, Patreon and Commands tabs, live inside TD's Palette Browser.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h7l2 3h9v11H3z M3 6V4h7l2 2"/></svg>Web panel in the Palette Browser</strong><span>With the companion (v0.21.0+) loaded, TouchDesigner's Palette Browser gains <strong>TDXLU</strong> and <strong>Patreon</strong> tabs next to the stock palette — served by the launcher on localhost, token-gated, the Patreon cookie never leaves the launcher.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg>TDXLU tab: Toolbox and FNS shelf</strong><span>Your pinned tools and the FNSTools packages, browsable and drag-ready in one place — same as the desktop Palette tab, but narrower for the dialog.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 6 6 6-6 6 M13 18h7"/></svg>Commands sub-tab</strong><span>Every command your tools announced to <code>FNS_CommandRegistry</code> — the same list the quick-launch <code>?</code> prefix shows, with inline argument prompts, run straight in that session.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Click to place</strong><span>Every component row has a ↳ button that places it straight into the session's network editor — no drag needed (the panel is a texture). Same <code>load_tox</code> path the desktop Palette tab uses.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 15 6-6 M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0 M16 8l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/></svg>Pin selected COMP</strong><span>Select a COMP in the network editor and click <strong>Pin selected COMP</strong>: it's saved as a <code>.tox</code> into your TouchDesigner palette's <strong>TDXLU Toolbox</strong> folder and pinned as a Toolbox tool. Never overwrites the same file twice.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Session bar</strong><span>Save, Thumbnail and Preview video buttons, plus an Autosave chip once <code>FNS_Autosave</code> is installed — and an optional health line (fps · cook ms · drops · GPU) when the launcher's Performance monitor is on.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v16H3z M3 9h18 M7 6h1 M11 6h1"/></svg>Session sub-tab</strong><span>The session’s tools in a list with live summaries: <strong>Git</strong> (branch, changes, commit), <strong>Backup</strong> (what would copy, back up now), <strong>Phone Remote</strong> (QR code, one-click on, expose COMPs) and <strong>Windows</strong> (focus, minimize, restore, manage layout). Each opens full-height with a back crumb.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 6 6 6-6 6 M13 18h7"/></svg>Command favourites</strong><span>Pin commands from the quick-launch, Settings, or the Commands tab; favourites sort first everywhere and travel with settings export/import.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Git &amp; backup</h3>
+          <p>Side panels for keeping projects safe — versioned or copied.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 6v12 M17 6v3c0 4-10 2-10 6 M5 2h4v4H5z M15 2h4v4h-4z M5 18h4v4H5z"/></svg>Git panel</strong><span>Changes and history, diffs, stage/commit, branch, pull/push — with your installed Git's credentials, or an optional GitHub token in Settings. Creating a repo seeds a TouchDesigner <code>.gitignore</code>, so <code>Backup/</code>, increments and crash autosaves stay out of the first commit.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12 m-5-5 5 5 5-5 M4 16v5h16v-5"/></svg>Backup panel</strong><span>Project folder ↔ USB or synced folder; include/exclude globs and a max file size; backup, restore, sync — no deletes, ever.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12 m-5-5 5 5 5-5 M4 16v5h16v-5"/></svg>Direct cloud</strong><span>Connect Google Drive, Dropbox, OneDrive, or Box: a one-time <code>rclone</code> download, sign in via your browser, then it's a backup destination.</span></div></div>
+        </div>
+      </div>
+
+      <div class="feature-cat">
+        <div class="feature-cat-head">
+          <h3>Getting oriented</h3>
+          <p>Setup, shortcuts and in-app help.</p>
+        </div>
+        <div class="feature-cat-list">
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>First-run tour</strong><span>A spotlight walkthrough that drives the app as it talks — switching tabs, narrating what lives where. Replay it from Help ▾ anytime.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>First-encounter tips</strong><span>The first time you open a tab or panel, a small non-blocking bubble explains it. Once each, ever.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16 M4 12h16 M4 18h16 M8 3v6 M16 9v6 M10 15v6"/></svg>Setup wizard</strong><span>Theme, view mode, <code>.toe</code> association, companion install, tray behavior — right after the tour, rerunnable from Help.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>Self-updating</strong><span>A quiet check once a day, never while a TouchDesigner session is running, plus <strong>Help ▾ → About &amp; updates</strong>; a found update waits in the header’s <strong>Update</strong> chip and offers Install &amp; Relaunch. Skip a version to dismiss it for good, or turn the daily check off — Settings lists what you skipped.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16 M4 12h16 M4 18h16 M8 3v6 M16 9v6 M10 15v6"/></svg>Settings, paged</strong><span>Eight categories in a sidebar and a search box that finds a setting by the name of its control — every "open Settings" button lands on the section it means.</span></div></div>
+          <div class="feat"><div class="feat-text"><strong><svg class="feat-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m4 6 6 6-6 6 M13 18h7"/></svg>Rebindable keys</strong><span>Launching the startup file, the view toggles, folder reveal and the README keys are yours to change — each with Reset, plus Reset all to defaults.</span></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ───── Download ───── -->
+  <section id="download">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Download</h2>
+        <p>Grab the installer for your platform. It's free — no account, no licence key.</p>
+      </div>
+      <div class="paths paths--two">
+        <div class="path path--win">
+          <div class="path-tag">Windows</div>
+          <h3>Installer</h3>
+          <p><code>.msi</code> / <code>.exe</code> installer for Windows 10 and up.</p>
+          <a class="btn btn-primary" href="https://launchdl.functionstore.tools/app/downloads/TDX%20Launcher%20Ultra%20Setup.exe">Download for Windows →</a>
+        </div>
+        <div class="path path--mac">
+          <div class="path-tag">macOS</div>
+          <h3>Disk image</h3>
+          <p>A <code>.dmg</code> for Apple Silicon, signed and notarized by Apple. Open it and drag the app to Applications.</p>
+          <a class="btn btn-primary" href="https://launchdl.functionstore.tools/app/downloads/TDX%20Launcher%20Ultra.dmg">Download for macOS →</a>
+        </div>
+      </div>
+      <p class="update-note">
+        The app checks for updates once a day, never while a TouchDesigner session is running. You can skip individual releases or turn the check off in Settings.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap footer-inner">
+    <div>© 2026 TDX Launcher Ultra · Built for TouchDesigner</div>
+    <div class="footer-links">
+      <a href="/docs/">Docs</a>
+      <a href="/demo/">Demo</a>
+      <a href="https://derivative.ca" target="_blank" rel="noopener">TouchDesigner</a>
+      <a href="https://patreon.com/function_store" target="_blank" rel="noopener">Patreon</a>
+      <a href="https://functionstore.xyz" target="_blank" rel="noopener">Function Store</a>
+      <a href="mailto:dan%2Btdxlu@functionstore.xyz?subject=TDX%20Launcher%20Ultra%20feedback">Feedback</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/site-nav.js" defer></script>
+<!-- Vercel Web Analytics. The platform serves this route once the feature is
+     enabled on the project, so there is no third-party host to preconnect to
+     and nothing to configure here. The stub queues any va() calls made before
+     the deferred script lands; without it those calls would throw. -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script src="/_vercel/insights/script.js" defer></script>
+
+</body>
+</html>

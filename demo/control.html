@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TDXLU Control (demo)</title>
+    <style>
+      html, body, #root { margin: 0; height: 100%; background: #1a1a1e; color: #e8e8ec; }
+      /* Demo chrome. The app fills the rest: body is the flex column so the
+         bar never overlaps the UI and #root can still be 100%-height. */
+      body {
+        display: flex;
+        flex-direction: column;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      #root { flex: 1; min-height: 0; height: auto; }
+      #demo-bar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 7px 14px;
+        background: #101014;
+        border-bottom: 1px solid #2a2a32;
+        font-size: 12px;
+        line-height: 1.45;
+        color: #9aa0ad;
+      }
+      #demo-bar .badge {
+        flex: none;
+        padding: 1px 7px;
+        border-radius: 999px;
+        background: #7dce7d;
+        color: #10240f;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+      #demo-bar strong { color: #d7dbe4; font-weight: 600; }
+      #demo-bar .spacer { flex: 1; }
+      #demo-bar a { color: #9fd39f; text-decoration: none; white-space: nowrap; }
+      #demo-bar a:hover { text-decoration: underline; }
+      @media (max-width: 620px) { #demo-bar .hide-sm { display: none; } }
+    </style>
+  </head>
+  <body>
+    <div id="demo-bar">
+      <span class="badge">Demo</span>
+      <span><strong>Phone remote</strong> — what opens on your phone after pairing over Wi-Fi, on mock data. <span class="hide-sm">Every running session becomes a tab; the exposed parameters are live.</span></span>
+      <span class="spacer"></span>
+      <a href="./index.html">← Full demo</a>
+        <a href="./quick.html">Quick Launch →</a>
+        <a href="../#download">Download →</a>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="./control.tsx"></script>
+    <!-- Vercel Web Analytics — see demo/index.html. -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script src="/_vercel/insights/script.js" defer></script>
+  </body>
+</html>

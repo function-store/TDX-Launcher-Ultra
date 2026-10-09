@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="/favicon.png" type="image/png" />
+<link rel="apple-touch-icon" href="/favicon.png" />
+<title>TDX Launcher Ultra Docs — TouchDesigner project launcher manual</title>
+<meta name="description" content="The TDX Launcher Ultra manual: launching and build detection, project versions, the companion TOX, quick launch, Phone Remote, the FNSTools store and its launcher capabilities (autosave, collect, media browser, phone touch), Toolbox, git and backup, heartbeat watchdog." />
+<meta property="og:title" content="TDX Launcher Ultra — Docs" />
+<meta property="og:description" content="The manual: launching, versions, companion TOX, quick launch, Phone Remote, FNSTools and its launcher capabilities, Toolbox, git &amp; backup, watchdog." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="TDX Launcher Ultra" />
+<meta property="og:url" content="https://launcher.functionstore.tools/docs/" />
+<meta property="og:image" content="https://launcher.functionstore.tools/og.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="TDX Launcher Ultra showing a project gallery and the TouchDesigner build each project needs" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://launcher.functionstore.tools/docs/" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site-nav.css">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-1: #111111;
+    --bg-2: #161616;
+    --bg-3: #1c1c1c;
+    --border: #262626;
+    --border-strong: #3a3a3a;
+    --text: #f5f5f5;
+    --text-dim: #a3a3a3;
+    --text-faint: #737373;
+    --accent: #4ade80;
+    --accent-dim: #12271a;
+    --accent-bright: #86efac;
+    --alt: #64a0ff;
+    --alt-dim: #16222f;
+    --max-w: 1140px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-padding-top: 84px; scroll-behavior: smooth; }
+  :target { scroll-margin-top: 84px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-bright); }
+  code, kbd {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.9em;
+    background: var(--bg-2);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--text-dim);
+  }
+  kbd { border: 1px solid var(--border-strong); color: var(--text); }
+
+  .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+  header.site {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; max-width: var(--max-w); margin: 0 auto;
+  }
+  nav.site-nav { display: flex; gap: 28px; align-items: center; font-size: 14px; }
+  nav.site-nav a:not(.btn) { color: var(--text-dim); }
+  nav.site-nav a:not(.btn):hover { color: var(--text); }
+  nav.site-nav a[aria-current="page"] { color: var(--text); font-weight: 600; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 8px;
+    font-weight: 600; font-size: 14px;
+    border: 1px solid transparent; cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: #0a0a0a; }
+  .btn-primary:hover { background: var(--accent-bright); color: #0a0a0a; }
+  .btn-secondary { background: transparent; color: var(--text); border-color: var(--border-strong); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ───── Docs layout ───── */
+  .docs-head { padding: 48px 0 8px; }
+  .docs-head h1 {
+    font-size: clamp(32px, 4.5vw, 44px);
+    font-weight: 700; letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+  .docs-head p { color: var(--text-dim); font-size: 16px; max-width: 68ch; margin: 0; }
+
+  .docs-grid {
+    display: grid; grid-template-columns: 230px minmax(0, 1fr);
+    gap: 48px; padding: 32px 0 80px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .docs-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+  aside.toc {
+    position: sticky; top: 84px;
+    font-size: 13px;
+    max-height: calc(100vh - 108px);
+    overflow-y: auto;
+  }
+  @media (max-width: 860px) {
+    aside.toc { position: static; max-height: none; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--bg-1); }
+  }
+  .toc-head {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-faint); margin: 0 0 10px;
+  }
+  .toc ul { list-style: none; margin: 0 0 18px; padding: 0; }
+  .toc li { margin: 0; }
+  .toc a {
+    display: block; padding: 4px 0;
+    color: var(--text-dim);
+  }
+  .toc a:hover { color: var(--text); }
+
+  article.docs { min-width: 0; }
+  article.docs section { border-top: 1px solid var(--border); padding: 36px 0; }
+  article.docs section:first-child { border-top: none; padding-top: 0; }
+  article.docs h2 {
+    font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+    margin: 0 0 14px;
+  }
+  article.docs h3 {
+    font-size: 17px; font-weight: 650; letter-spacing: -0.01em;
+    margin: 26px 0 8px; color: var(--text);
+  }
+  article.docs p, article.docs li { color: var(--text-dim); font-size: 15px; }
+  article.docs p { margin: 0 0 14px; }
+  article.docs ul, article.docs ol { margin: 0 0 14px; padding-left: 22px; }
+  article.docs li { margin-bottom: 6px; }
+  article.docs strong { color: var(--text); font-weight: 600; }
+
+  table.doc {
+    width: 100%; border-collapse: collapse;
+    font-size: 14px; margin: 0 0 16px;
+  }
+  table.doc th, table.doc td {
+    text-align: left; padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.doc th {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-faint);
+  }
+  table.doc td { color: var(--text-dim); }
+  table.doc td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+  .table-scroll { overflow-x: auto; }
+
+  .callout {
+    border: 1px solid rgba(74,222,128,0.25);
+    background: linear-gradient(135deg, rgba(74,222,128,0.07) 0%, var(--bg-1) 60%);
+    border-radius: 10px; padding: 14px 18px; margin: 0 0 16px;
+    font-size: 14px; color: var(--text-dim);
+  }
+  .callout strong { color: var(--text); }
+
+  .code-block {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    overflow-x: auto;
+    margin: 0 0 16px;
+  }
+  .code-block code { background: none; padding: 0; }
+
+  .pro-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(129,140,248,0.45);
+    background: rgba(129,140,248,0.12);
+    color: #a5b4fc;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: 3px;
+  }
+
+  footer.site {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: var(--text-faint); }
+  .footer-links a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="site-inner">
+    <div class="brand">
+      <img class="brand-logo" src="/favicon.png" alt="" width="28" height="28" decoding="async" />
+      <div class="brand-lockup">
+        <a href="/" class="brand-name">TDX Launcher Ultra</a>
+        <span class="brand-credit">by <a href="https://functionstore.xyz/link-in-bio" target="_blank" rel="noopener noreferrer">Function Store</a></span>
+      </div>
+    </div>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+      <span class="nav-toggle__bar" aria-hidden="true"></span>
+    </button>
+    <nav id="site-nav" class="site-nav">
+      <a href="/#quickstart">Quick start</a>
+      <a href="/#features">Features</a>
+      <a href="/docs/" aria-current="page">Docs</a>
+      <a href="/demo/">In your browser</a>
+      <a class="btn btn-primary" href="/#download">Download free →</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="docs-head">
+    <h1>The manual.</h1>
+    <p>
+      Everything the app does, in the order you'll meet it. The app also explains itself — a first-run
+      tour, one-time tips, and <kbd>F1</kbd> for every shortcut — so this page is for reading ahead,
+      linking someone to a feature, or understanding what a button really does before a show.
+    </p>
+  </div>
+
+  <div class="docs-grid">
+
+    <aside class="toc">
+      <p class="toc-head">Basics</p>
+      <ul>
+        <li><a href="#getting-started">Getting started</a></li>
+        <li><a href="#tabs">The tabs</a></li>
+        <li><a href="#quick-launch">Quick launch</a></li>
+        <li><a href="#versions">Project versions</a></li>
+        <li><a href="#sessions">Running sessions</a></li>
+      </ul>
+      <p class="toc-head">Media &amp; metadata</p>
+      <ul>
+        <li><a href="#media">Project media &amp; sidecar</a></li>
+        <li><a href="#media-browser">Media browser</a></li>
+      </ul>
+      <p class="toc-head">The companion</p>
+      <ul>
+        <li><a href="#companion">Companion TOX</a></li>
+        <li><a href="#palette-tabs">Palette tabs in TouchDesigner</a></li>
+        <li><a href="#autosave">Autosave</a></li>
+        <li><a href="#collect">Collect</a></li>
+      </ul>
+      <p class="toc-head">Tools</p>
+      <ul>
+        <li><a href="#fnstools">FNSTools</a></li>
+        <li><a href="#components">Components from anywhere</a></li>
+      </ul>
+      <p class="toc-head">The phone</p>
+      <ul>
+        <li><a href="#phone">Phone Remote</a></li>
+        <li><a href="#touch">Phone multi-touch</a></li>
+      </ul>
+      <p class="toc-head">More tools</p>
+      <ul>
+        <li><a href="#toolbox">Toolbox</a></li>
+        <li><a href="#git-backup">Git &amp; backup</a></li>
+        <li><a href="#heartbeat">Heartbeat watchdog</a></li>
+        <li><a href="#displays">Displays &amp; GPU</a></li>
+      </ul>
+      <p class="toc-head">Reference</p>
+      <ul>
+        <li><a href="#settings">Settings &amp; shortcuts</a></li>
+        <li><a href="#free-pro">Free &amp; FNSTools Plus</a></li>
+      </ul>
+    </aside>
+
+    <article class="docs">
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="getting-started">
+        <h2>Getting started</h2>
+        <p>
+          Install from the <a href="/#download">download page</a> and open the app — there's no import step.
+          The Recent tab merges TouchDesigner's own recent-files list with the launcher's history, so your
+          projects are already there. A first-run tour drives the app while it narrates, then a short setup
+          wizard covers theme, <code>.toe</code> file association, the companion TOX, and tray behavior.
+          Both rerun anytime from <strong>Help ▾</strong> (<strong>Start Tour</strong>,
+          <strong>Setup Wizard</strong>).
+        </p>
+        <p>
+          Select a project and the launcher reads the exact TD build it was saved with — straight from the
+          file, via Derivative's <code>toeexpand</code> — and highlights the matching install. If that build
+          isn't on the machine, a <strong>Download</strong> button fetches the exact installer from Derivative
+          and runs it for you. With the file association set, double-clicking a <code>.toe</code> anywhere
+          routes through the launcher with a 5-second auto-launch countdown; any keypress or click cancels it.
+        </p>
+        <p>
+          When a double-clicked project needs a build you don't have, the launcher asks once what it should
+          do about it — and remembers the answer under
+          <strong>Settings → General → Opening a project from Finder</strong> (Explorer on Windows): open with the
+          <strong>latest</strong> build, the <strong>closest</strong> one, a specific build you
+          <strong>pin</strong>, or always stop and let you pick. Only the auto-launch path uses it; picking
+          a version yourself in the app is untouched.
+        </p>
+        <p>
+          The app keeps itself current: a quiet update check once a day, never while a TouchDesigner
+          session is running, plus <strong>Help ▾ → About &amp; updates → Check for updates</strong>. A
+          found update waits in the header's <strong>Update</strong> chip; the daily check can be turned
+          off under <strong>Settings → General → Updates</strong>. The companion TOX has its own release
+          channel, so a new TOX reaches you without an app update — and vice versa.
+        </p>
+        <div class="callout">
+          <strong>macOS:</strong> builds are signed and notarized by Apple, so the app opens like any
+          other — no Terminal step. Only builds older than 0.20.0 need the quarantine flag cleared once:
+          <code>xattr -cr "/Applications/TDX Launcher Ultra.app"</code>.
+        </div>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="tabs">
+        <h2>The tabs</h2>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Tab</th><th>What it holds</th></tr>
+          <tr><td>Recent Files</td><td>Merged TD + launcher recents. Gallery of project cards with hover-playing previews, tags, the versions drawer, and the version panel on the right. Everything launches from here.</td></tr>
+          <tr><td>Sessions</td><td>TouchDesigner sessions running <em>right now</em> — including ones opened outside the launcher, found by process scan — and the ones that just ended. An inspector, not a launcher: see <a href="#sessions">Running sessions</a>.</td></tr>
+          <tr><td>Templates</td><td>Starter <code>.toe</code> files in your own order (<kbd>Ctrl/⌘+↑/↓</kbd> reorders). The first row, <strong>Default (new project)</strong>, starts TouchDesigner with its default startup file on <kbd>Ctrl/⌘+1</kbd>; your templates take <kbd>Ctrl/⌘+2…9</kbd>, from anywhere in the app. Right-clicking the big <strong>Launch</strong> button also starts the default startup file, whatever is selected. The tab has one default TD version (<strong>Latest</strong> follows your newest install).</td></tr>
+          <tr><td>Palette</td><td>TouchDesigner's factory palette for the selected build, your <code>Documents/Derivative/Palette</code>, plus any folders you add. Drag a <code>.tox</code> straight into a TD network. The pinned <a href="#toolbox">Toolbox</a> sits on top.</td></tr>
+          <tr><td>FNSTools</td><td>Store, installer and global configurator for the <a href="https://tools.functionstore.xyz" target="_blank" rel="noopener">FNSTools</a> toolkit — tick the tools a project should have and install them straight into it. Free to browse and download, no TouchDesigner session needed; Plus packages unlock with a membership. Hide the tab under <strong>Settings → General → Theme &amp; view</strong>. See <a href="#fnstools">FNSTools</a>.</td></tr>
+          <tr><td>Patreon</td><td>Browse <code>.tox</code> components from creators you support and load one into a running session. Connect with <strong>Log in with Patreon</strong> under <strong>Settings → Accounts → Patreon</strong>, or paste your session cookie there (Patreon's official API can't list post attachments). Function Store sits first in the creator list; its × hides it.</td></tr>
+        </table></div>
+        <p>
+          <kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> cycle the tabs; <kbd>Alt/⌥+1…4</kbd> jump to Recent Files,
+          Sessions, Templates and Palette, <kbd>Alt/⌥+5</kbd> to Patreon and <kbd>Alt/⌥+6</kbd> to FNSTools.
+          The whole app is keyboard-drivable — <kbd>F1</kbd> lists everything.
+        </p>
+        <p>
+          <strong>Each tab keeps its own search.</strong> The toolbar's search box filters the list you are
+          looking at and nothing else — a query typed on Palette stays on Palette, and a tab holding an
+          active filter is marked in the tab bar so a stale query never reads as an empty tab. The
+          <strong>Sessions</strong> tab also carries a badge with the number of sessions running right now.
+        </p>
+        <p>
+          Above the tabs, the header holds the <strong>Update</strong> chip when an update is waiting, a
+          <strong>▭</strong> window switcher while TouchDesigner windows are open (<kbd>Alt/⌥+W</kbd>: search
+          every window of every session and focus one), <strong>📱 Phone</strong>, View, Settings,
+          <strong>Help ▾</strong>, and <strong>♥ Support</strong>, which opens Function Store's
+          <a href="https://www.patreon.com/function_store/join" target="_blank" rel="noopener">Patreon page</a>.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="quick-launch">
+        <h2>Quick launch</h2>
+        <p>
+          The launcher window itself is one keystroke away from anywhere — the main global hotkey
+          (default <kbd>Ctrl/⌘+Shift+D</kbd>) brings it up over whatever you're doing, TD fullscreen
+          included. For the times you'd rather type a name than browse, press the Quick Launch hotkey
+          (default <kbd>Alt/⌥+Shift+D</kbd>) and a small search overlay appears over everything.
+          One input, everything reachable:
+        </p>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Result</th><th>Matched on</th><th>Enter</th><th>Also</th></tr>
+          <tr><td>Project</td><td>name, path, tags</td><td>Launch the head with its detected build</td><td><kbd>Ctrl+Enter</kbd> → TouchPlayer</td></tr>
+          <tr><td>Running session</td><td>name, path</td><td>Focus its window</td><td><kbd>→</kbd> lists its windows to focus one</td></tr>
+          <tr><td>Component (.tox)</td><td>name, category, creator</td><td>Place into the running session</td><td>drag the row straight into a TD network</td></tr>
+          <tr><td>Template</td><td>name</td><td>New project from it</td><td></td></tr>
+          <tr><td>Command</td><td>verb</td><td>Run it</td><td><code>&gt;</code> filters to commands only</td></tr>
+          <tr><td>Tool command</td><td>label, help text</td><td>Run it in the session that offers it</td><td><code>?</code> filters to tool commands only</td></tr>
+        </table></div>
+        <p>
+          An empty query shows running sessions, recent projects and the app commands; typing fuzzy-matches
+          across everything, field-aware — a name hit outranks a category hit outranks a path hit — and
+          forgives typos and initials (<code>kinnect</code>, <code>colour</code>, <code>mfo</code> for
+          movieFileOut). Commands you run often rise in the list, the weighting fading over a couple of
+          weeks; the toggle is <strong>Rank by usage</strong> in <strong>Settings → Quick Launch</strong>.
+          Executed queries are remembered: <kbd>Alt+↑</kbd> / <kbd>Alt+↓</kbd> cycle back through what you
+          ran before, shell style, and typing anything starts a fresh draft again.
+        </p>
+        <h3>Filter tokens</h3>
+        <ul>
+          <li><code>&gt;</code> — commands only. Verb-first, per session: Focus, Save, Thumbnail, Preview video, Relaunch, Kill — plus the app's own actions and <strong>New default project</strong>. <strong>Destructive commands arm on the first Enter</strong> — the row turns red and a second Enter fires; any other key disarms. Nothing destructive on a single keypress, ever.</li>
+          <li><code>?</code> — <a href="#tool-commands">tool commands</a> only: the actions components inside your running sessions have published.</li>
+          <li><code>=</code> <em>(leading)</em> — components only. Bare <code>=</code> browses the whole library grouped by where things live; <code>=midi</code> searches just components.</li>
+          <li><code>/x</code> — filter by <em>place</em>: a palette folder, Toolbox category, Patreon creator, or <code>/templates</code>. Combines with <code>=</code> and search words.</li>
+          <li><code>#x</code> — filter by project tag. Running sessions keep their project's tags, so <code>#show</code> surfaces a live show too.</li>
+        </ul>
+        <p>
+          All five prefix characters are customizable in <strong>Settings → Quick Launch</strong> — the
+          overlay's placeholder and hints follow whatever you pick. Three global hotkeys are configurable
+          independently under <strong>Settings → Keys → Global hotkeys</strong>: the main window, Quick
+          Launch, and the main window jumped to the Palette tab. The first two are bound by default; the
+          Palette one is opt-in.
+        </p>
+
+        <h3 id="tool-commands">Tool commands</h3>
+        <p>
+          Components in a running project can publish their own actions to the palette — "Set BPM",
+          "Record 2 seconds", "Toggle the strobe" — and the launcher runs them over the
+          <a href="#companion">companion bus</a>. They ride the normal command list and own the
+          <code>?</code> prefix, carry a <strong>TOOL</strong> badge, and show the tool's own one-line help
+          under the label. Nothing to set up: a session carrying a tool that registers commands contributes
+          them the moment it is running.
+        </p>
+        <p>
+          A command can declare <strong>arguments</strong>. They render as ghost chips after the label and
+          fill in as values arrive — either through a short prompt flow (typed values in the input, menus
+          and toggles as pick rows) or <strong>inline</strong>, by typing them after the name:
+          <code>? rec 2</code> runs the recorder with <code>seconds=2</code> and fires immediately when
+          every other argument has a default. The tool validates values before its own code sees them, so a
+          bad number or a missing required argument refuses the run rather than half-doing it.
+        </p>
+        <p>
+          When several sessions offer the same command they merge into one row with a
+          <strong>session-count badge</strong>. The run goes to the session the palette was summoned over —
+          whichever TouchDesigner window you were last in — and when that is ambiguous you pick the session
+          from a list (<kbd>→</kbd> opens that picker on any tool command). The same tool loaded in three
+          projects is three targets, not three rows.
+        </p>
+
+        <h3>Command favourites</h3>
+        <p>
+          Pin commands to make them float to the top of every list. Pin them from:
+        </p>
+        <ul>
+          <li><strong>Quick-launch overlay</strong> — the <strong>★</strong> on any command row (or <kbd>Ctrl+D</kbd> / <kbd>⌘+D</kbd> after selecting a row)</li>
+          <li><strong>Settings → Quick Launch</strong> — every tool command the launcher has seen, with a <strong>★</strong> to pin it (clicking the row shows or hides the command)</li>
+          <li><strong>Palette Commands tab</strong> (in TouchDesigner with the companion v0.21.0+) — the <strong>★</strong> on hover</li>
+        </ul>
+        <p>
+          Favourites sort first in the quick-launch and the Palette Commands tab, and rank higher in
+          typed queries — so the second time you need something is muscle memory. The list travels
+          with settings export/import, so your favourites move to a new machine with you.
+        </p>
+
+        <div class="callout">
+          <strong>Writing a tool?</strong> Publishing commands is a decorator on the method and one
+          <code>announce()</code> call from your component's init, through
+          <code>FNS_CommandRegistry</code>. Commands from the
+          <a href="#fnstools">FNSTools</a> toolkit show up here automatically.
+        </div>
+        <p><a href="/demo/quick.html">Try the overlay in the browser demo →</a></p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="versions">
+        <h2>Project versions</h2>
+        <p>
+          TouchDesigner projects accumulate copies of themselves: incremental saves
+          (<code>Project.2.toe</code>, <code>Project.3.toe</code>, …), backups in
+          <code>Backup/</code>, and <code>CrashAutoSave.*.toe</code> after a crash. The Recent tab folds all
+          of them into one <strong>family card</strong> per project with a <strong>⑂ N</strong> badge.
+          Launch on the card always fires the head (<code>Project.toe</code>) — never a guessed variant; if
+          you last opened a different copy, the card says so. A <strong>⚠</strong> chip appears when a crash
+          autosave newer than the head exists.
+        </p>
+        <p>
+          Grouping is deterministic — filesystem conventions only, nothing stored — and toggles with
+          <strong>View → Group project versions</strong> (<kbd>V</kbd>). Click the badge for the drawer:
+        </p>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Action</th><th>Effect</th></tr>
+          <tr><td>Launch</td><td>Launch that exact file, TD build detected from it</td></tr>
+          <tr><td>Select</td><td>Put it in the picker to inspect or pick a version</td></tr>
+          <tr><td>Reveal</td><td>Show that file in Finder or Explorer</td></tr>
+          <tr><td>Duplicate</td><td>Copy any row into a fresh <code>Name.N.toe</code> — the same numbering TD's incremental save uses, so it folds straight into the family</td></tr>
+          <tr><td>Restore…</td><td>Make a copy the new head. The current head is preserved first as the next free increment — nothing is overwritten or deleted</td></tr>
+          <tr><td>Recycle</td><td>Tick copies (never the head) and move them to the OS trash; the footer shows how much space the copies hold</td></tr>
+        </table></div>
+        <p>
+          <strong>Restore</strong> is the "I kept working from <code>Backup/Project.30.toe</code>" fix:
+          promote the backup, and the family has one unambiguous head again.
+          <strong>Duplicate as new version</strong> on any project's context menu starts a family from a
+          single-file project.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="sessions">
+        <h2>Running sessions</h2>
+        <p>
+          The <strong>Sessions</strong> tab shows what a running project <em>is</em> — TD version, PID,
+          launched here or opened externally, uptime — rather than a version picker, since the version is
+          already decided. Each session is a card; click it to expand its companion row and session tools.
+        </p>
+        <p>
+          A <strong>status dot</strong> leads every card: green while it runs; pulsing amber, with a
+          <strong>not responding</strong> chip beside the name, when its companion has stopped pulsing —
+          TouchDesigner is frozen, or busy with a long save; hollow grey once it has ended. A session without
+          the companion has nothing to judge silence by, so it only ever reads running or ended.
+        </p>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Action</th><th>Effect</th></tr>
+          <tr><td>Focus</td><td>Bring the TD window to the front</td></tr>
+          <tr><td>Save · Thumbnail · Preview video</td><td>Save the <code>.toe</code> in place; refresh the project icon and <code>preview/preview.png</code>; record <code>preview/preview.mp4</code> — <em>companion</em></td></tr>
+          <tr><td>Heartbeat</td><td>Hand the session to the <a href="#heartbeat">Heartbeat watchdog</a> — <em>companion</em></td></tr>
+          <tr><td>Add to project ▾</td><td>Local <code>.tox</code>, From URL / GitHub, From package — see <a href="#components">Components from anywhere</a> — <em>companion</em></td></tr>
+          <tr><td>Relaunch…</td><td>Confirm dialog — pick the TD version there, optionally killing the current process first</td></tr>
+          <tr><td>Kill</td><td>Terminate the TD process (with confirmation)</td></tr>
+          <tr><td>Windows</td><td>The session's OS windows — focus, minimize or restore each, or all at once</td></tr>
+          <tr><td>⋯</td><td>Reveal the <code>.toe</code> in the file manager, Copy path, and Open Envoy panel for an Embody project</td></tr>
+        </table></div>
+        <p>
+          Actions marked <em>companion</em> appear once the session runs the <a href="#companion">companion TOX</a>.
+          Right-click a card for the same verbs, plus whatever installed <a href="#fnstools">FNSTools</a>
+          packages add.
+        </p>
+        <p>
+          <strong>Accidental-kill insurance:</strong> a session the launcher started that ends — killed or
+          crashed — and any session you kill from the launcher stays on the tab, below an
+          <strong>Ended</strong> divider, one row per project. <strong>Relaunch</strong> starts it again with
+          the build it last ran, no confirm needed (its process is already gone); <strong>Dismiss</strong>
+          removes the row. Ended rows live for the current launcher run only.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="media">
+        <h2>Project media &amp; sidecar</h2>
+        <p>
+          Each project card can carry an icon, a hero still, and a hover-playing preview clip. The gallery
+          reads them from a media folder beside the <code>.toe</code> — first match wins:
+        </p>
+        <ol>
+          <li><code>media_dir</code> from the sidecar, if set</li>
+          <li><code>preview/</code> — what the companion TOX writes</li>
+          <li><code>{stem}_media/</code>, <code>{stem}.media/</code>, <code>media/</code>, <code>gallery/</code>, <code>_media/</code></li>
+        </ol>
+        <p>
+          Supported: <code>png jpg jpeg webp gif bmp</code> · <code>mp4 webm mov m4v avi</code>. Select the
+          project and thumbnails appear under the version header — <strong>Browse</strong> for fullscreen,
+          <strong>Folder</strong> to open it in the file manager. Clips stream only while hovered.
+        </p>
+        <h3>The sidecar (<code>MyProject.tdxlu.json</code>)</h3>
+        <p>
+          Everything the launcher knows about a project lives in one plain-JSON file next to the
+          <code>.toe</code> — no database, travels with the project:
+        </p>
+        <div class="code-block"><code>{
+  "version": 1,
+  "tags": ["show/live", "client/acme"],
+  "title": "Optional display title",
+  "description": "Short blurb",
+  "hero": "preview/hero.png",
+  "media_dir": "preview",
+  "media": [
+    { "path": "extra/cover.png", "kind": "image", "caption": "Cover" }
+  ],
+  "gpu": { "monitor": 1 },
+  "windows": {
+    "apply_on_load": true,
+    "items": [
+      { "path": "/perform", "display": 1, "justify_to": "specifydisplay", "size": "fill", "open": true }
+    ]
+  }
+}</code></div>
+        <p>
+          Folder contents merge with explicit <code>media</code> entries; omit <code>hero</code> and the
+          first folder image is used. Tags you set in the launcher land here, and the file is yours to edit
+          by hand.
+        </p>
+        <p>
+          <code>gpu</code> and <code>windows</code> are written by the
+          <a href="#displays">Displays &amp; GPU</a> controls. Every write to this file — from the launcher,
+          from the companion, by hand — merges: keys one side does not recognise pass through untouched, so
+          the two can never clobber each other.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="media-browser">
+        <h2>Media browser</h2>
+        <p>
+          Every movie, image, audio and geometry file a running project <em>references</em>, in one list.
+          It ships as the <code>FNS_MediaBrowser</code> package from the <a href="#fnstools">FNSTools</a> store —
+          not released yet; the FNSTools tab lists it once it is. Installed, it fills the
+          <strong>Media files</strong> panel on the Sessions tab, while the same panel lives inside the package
+          itself — a complete tool with no launcher running. Selecting a reference shows a live preview of the referencing operator and what the file
+          actually is: resolution, duration, fps, and whether it carries audio — read from what the operator
+          already decoded, not guessed from the filename.
+        </p>
+        <ul>
+          <li><strong>Replace</strong> — point any reference at a different file. Nothing is copied and nothing is saved; it's the reference that changes.</li>
+          <li><strong>Missing files</strong> — a missing-only filter shows every reference whose file is gone. Per-row Replace fixes one; <strong>Locate missing…</strong> fixes them in bulk — point at the folder the files really live in (a moved drive, a restored backup) and every reference whose filename is found there is relinked in one go.</li>
+          <li><strong>Unused</strong> — media files sitting in the project folder that no operator references: the dead weight a backup or a <a href="#collect">Collect</a> would ship without telling you.</li>
+          <li><strong>Sync timeline</strong> — stretch the timeline to exactly fit a clip and lock its playback to it. Clips running on their own Time COMP offer the choice of local or global timeline.</li>
+        </ul>
+        <p>
+          Nothing in the media browser saves the project behind your back — relinks land in the live session,
+          and you decide when to save.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="companion">
+        <h2>Companion TOX</h2>
+        <p>
+          The launcher can only <em>start</em> TouchDesigner. <code>TDXLauncherUtility.tox</code> is a small
+          component that lives in your project and listens on a local TCP bus — it's what lets the launcher
+          talk to a session that's already running. It's fully self-contained: detected and driven over its
+          own connection, nothing else to install.
+        </p>
+        <h3>Getting it into a project</h3>
+        <p>
+          It ships inside the installer. On first run it's copied into your Palette and pinned in the Toolbox
+          as <strong>Launcher Utility</strong>. Any project needs it dragged into the root network once —
+          expand a session's card on the Sessions tab and, when the project has no companion, it offers a
+          <strong>⠿ TDXLauncherUtility.tox</strong> drag handle. To stop
+          repeating the drag, put the TOX in TouchDesigner's startup file
+          (<strong>Edit → Preferences → General</strong>) — then everything you build from scratch has it
+          from the first save.
+        </p>
+        <h3>What it unlocks</h3>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Action</th><th>What happens</th></tr>
+          <tr><td>Save</td><td>Save the <code>.toe</code> in place, from the launcher or the palette tabs</td></tr>
+          <tr><td>Thumbnail</td><td>Capture <code>preview/preview.png</code> plus the project icon — the gallery picks both up automatically</td></tr>
+          <tr><td>Preview video</td><td>Record a hover-preview clip (<code>preview/preview.mp4</code>, up to 30 s). Paths are stored relative, so moving the project doesn't orphan them</td></tr>
+          <tr><td>Autosave</td><td>Arm a save timer <em>inside</em> the session — needs the free <code>FNS_Autosave</code> package, see <a href="#autosave">Autosave</a></td></tr>
+          <tr><td>Collect…</td><td>Consolidate external media into the project — needs the <code>FNS_Collect</code> package, see <a href="#collect">Collect</a></td></tr>
+          <tr><td>Add to project ▾</td><td>Drop components into the live network editor from disk, GitHub, any URL, or a package index — see <a href="#components">Components from anywhere</a></td></tr>
+          <tr><td>Media files</td><td>The <a href="#media-browser">media browser</a>'s verbs, once the <code>FNS_MediaBrowser</code> package is in the project</td></tr>
+          <tr><td>Window layout</td><td>Read, save and restore the project's window placement — see <a href="#displays">Displays &amp; GPU</a></td></tr>
+          <tr><td>Heartbeat</td><td>The <a href="#heartbeat">crash watchdog</a> listens for its TCP pulses</td></tr>
+          <tr><td>Tool commands</td><td>Actions published by components in the session, runnable from the <a href="#tool-commands">quick-launch palette</a></td></tr>
+        </table></div>
+        <p>
+          When a running session carries an older companion than the launcher holds, the session card's
+          <strong>Companion</strong> row offers <strong>Update companion → v…</strong>, a one-click
+          <strong>in-place update</strong> — parameter values you've set survive the reload. The TOX also has
+          its own release channel, so updates reach you without waiting for an app release.
+        </p>
+        <p>
+          <strong>Using Embody/Envoy?</strong> Projects built with that optional toolkit for AI-assisted
+          TouchDesigner development carry a <code>.mcp.json</code> — the launcher detects it, shows the Envoy
+          port on the session card and an <strong>Envoy panel</strong> with the bridge's status, and can use
+          it as a last-resort transport for companion actions if the bus is ever down. A session without it
+          gets an <strong>Add Embody</strong> button on its Companion row: one click downloads the current
+          release and drops it in. Without Embody, nothing changes — the companion never needs it.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="palette-tabs">
+        <h2>Palette tabs in TouchDesigner</h2>
+        <p>
+          With the companion (v0.21.0+) loaded, TouchDesigner's own <strong>Palette Browser</strong>
+          (<kbd>Alt+L</kbd>) grows two extra tabs next to the stock palette: <strong>TDXLU</strong> and
+          <strong>Patreon</strong>. The tabs are served by the launcher on a localhost control server
+          and powered by a Web Render TOP inside a small generic registry (<code>FNS_PaletteRegistry</code>)
+          that any FunctionStore tool can publish a panel into.
+        </p>
+
+        <h3>The TDXLU tab</h3>
+        <p>
+          Your Toolbox and the FNSTools shelf, plus a <strong>Commands</strong> sub-tab listing
+          every command your tools announced to the session's <code>FNS_CommandRegistry</code> — the
+          same list the quick-launch <code>?</code> prefix shows. Each component row has a
+          <strong>↳</strong> button that places it straight into the current Network Editor pane;
+          URL tools and FNS packages not yet on disk show a <strong>☁</strong> and download into
+          the cache on first use.
+        </p>
+        <p>
+          When the launcher carries a newer companion than the session runs, the tab shows a
+          one-click <strong>Update</strong> button — parameter values you've set survive the reload.
+        </p>
+
+        <h3>The Patreon tab</h3>
+        <p>
+          Browse <code>.tox</code> components from the creators you support (or merely follow) and
+          load one into the selected running session. A <strong>Hide locked</strong> toggle filters
+          out posts you don't have access to — it's remembered between visits. The creator crumb bar is
+          sticky so the way back never scrolls away. The Patreon login stays in the launcher; TD
+          never sees the cookie.
+        </p>
+
+        <h3>How it works</h3>
+        <p>
+          The launcher serves the page on its localhost control server and hands the URL to each
+          session over the companion bus. The tab strip belongs to <code>FNS_PaletteRegistry</code>
+          — a small, reusable registry that any FNS tool can contribute a native panel to. The two
+          launcher tabs share one Chromium (CEF) process and swap pages via a route parameter; the
+          stock palette is untouched, and TD's native drag still works on the first tab. The browser
+          only runs while one of the launcher's tabs is showing, so there's no performance cost
+          when you're not using them.
+        </p>
+
+        <h3>Pin selected COMP</h3>
+        <p>
+          Select a COMP in the session's network editor, optionally pick a Toolbox category,
+          and click <strong>Pin selected COMP</strong> on the Toolbox sub-tab. The launcher's
+          companion saves it as a <code>.tox</code> into your TouchDesigner palette
+          (a <strong>TDXLU Toolbox</strong> folder, visible in TD's own palette), and pins it as a
+          local Toolbox tool. The same file is never pinned twice, and existing files are never
+          overwritten — a file that already exists in the folder is left untouched.
+        </p>
+
+        <h3>Session bar</h3>
+        <p>
+          Above the footer, a row of one-shot controls. Left side:
+          <strong>Save</strong> (writes the <code>.toe</code> in place), <strong>Thumbnail</strong>
+          (captures <code>preview/preview.png</code> and the project icon), <strong>Preview video</strong>
+          (records <code>preview/preview.mp4</code>, up to 30s), and an <strong>Autosave</strong>
+          chip showing the current state (e.g. "Autosave 10m" or "Autosave off") and toggling it once
+          <code>FNS_Autosave</code> is installed.
+          Right side: an optional health readout (fps, cook time in ms, dropped frames, GPU memory used/total)
+          when the launcher's <strong>Settings → Monitoring → Performance</strong> stats are on — the health
+          line turns amber when dropped frames climb.
+        </p>
+
+        <h3>Session sub-tab</h3>
+        <p>
+          The session’s tools, each with a live one-line summary, each opening full-height inside the tab
+          with a <strong>Session › &lt;tool&gt;</strong> crumb to return to the overview:
+        </p>
+        <ul style="margin-top: 12px; color: var(--text-dim); line-height: 1.8;">
+          <li><strong style="color: var(--text);">Collect &amp; Save</strong> — Scan the project's external media files, untick what to leave behind, and collect with live progress. Needs the <code>FNS_Collect</code> package.</li>
+          <li><strong style="color: var(--text);">Media</strong> — Show missing media references; re-root the relative paths that a folder move broke.</li>
+          <li><strong style="color: var(--text);">Git</strong> — Current branch, change count, a message field, and <strong>Commit all</strong> (saves the project first, by default).</li>
+          <li><strong style="color: var(--text);">Backup</strong> — Display what a backup to your configured folder would copy, and <strong>Back up now</strong> with a click.</li>
+          <li><strong style="color: var(--text);">Phone Remote</strong> — The link as a QR code to scan right off the palette, and a one-click toggle to enable. With <strong>FNS_Remote</strong> in the project (not released yet) it shows <em>that session's</em> code, with a switch between the full page and the client link, and the button opens the package's own pairing window inside TouchDesigner. Without the package it shows the launcher's fleet link — controlling parameters from the phone needs FNS_Remote.</li>
+          <li><strong style="color: var(--text);">Windows</strong> — The session's OS windows exactly as the launcher lists them (main window, torn-off panes named by content, Perform window) — focus, minimize, restore each, bring all forward, or save/apply/clear the project's window layout.</li>
+        </ul>
+
+        <h3>Commands: arguments and inline run</h3>
+        <p>
+          Commands can declare keyword arguments. They render as ghost chips after the label and
+          can be filled through a short prompt flow — or typed inline. For example, if a recorder
+          command declares <code>seconds</code>, typing <code>rec 2</code> in the search field fills
+          it and fires immediately when the rest is covered by defaults. The registry validates
+          values by declared style before the tool's method is called, so a bad number or a missing
+          required argument refuses the run with a named error rather than half-doing it.
+        </p>
+        <p>
+          In the Commands sub-tab, the favourite star appears on hover over any command;
+          pinned favourites stay visible. Favourites rank first in the list and carry a
+          <strong>★ Favourites</strong> group at the top.
+        </p>
+
+        <h3>The menu-bar button</h3>
+        <p>
+          The companion also puts a small <strong>TDXLU</strong> button in TouchDesigner's own menu bar,
+          beside the path field — one click opens the companion's parameters without hunting for the
+          component in the network. It is on by default and lives on the companion's
+          <strong>Registry</strong> page as <strong>Menu Bar Icon</strong>; turning it off hides the button
+          and leaves everything else alone.
+        </p>
+        <p>
+          It rides the same registry idea as the tabs: <strong>FNS_MainMenuRegistry</strong>, a shared
+          place any FunctionStore tool can publish a menu-bar widget into, so several tools can sit up
+          there without fighting over the bar. The companion carries its own copy, so a project that also
+          installs the package from the store ends up with one registry, not two.
+        </p>
+
+        <h3>Turn it off</h3>
+        <p>
+          Disable the feature with <strong>Palette tabs in TouchDesigner</strong> under
+          <strong>Settings → Advanced → Control panel server</strong>,
+          or per-session on the companion's <strong>Registry</strong> parameter page (which also holds
+          Install / Remove / Reload / Open Palette Browser buttons). Without a running launcher the
+          tabs show a hint instead of content.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="autosave">
+        <h2>Autosave</h2>
+        <p>
+          TouchDesigner has no autosave. <code>FNS_Autosave</code> adds one: a timer that runs
+          <em>inside</em> the session and saves the project for you. It is a free package in the
+          <a href="#fnstools">FNSTools</a> store — install it into a project and that session's card on the
+          Sessions tab grows an <strong>Autosave</strong> row: <strong>Open</strong> sets it up, and while it
+          is armed a <strong>↻</strong> chip beside the session's name shows the interval. The timer itself is
+          the package’s, so it keeps saving with the launcher closed.
+        </p>
+        <p>
+          Set the interval in minutes and pick what a save means:
+        </p>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Save mode</th><th>What it writes</th></tr>
+          <tr><td>TouchDesigner Save</td><td>The same save TD's own menu does, so it follows your <em>Increment Filename when Saving</em> and <em>Copy to Backup Folder</em> preferences — with increment on, a new numbered <code>.toe</code> each time</td></tr>
+          <tr><td>Overwrite the open .toe</td><td>Always writes back to the file you're working in, whatever those preferences say</td></tr>
+        </table></div>
+        <p>
+          Two skips keep it out of a show's way — <strong>only save when something changed</strong> and
+          <strong>skip while the project is in Perform Mode</strong> — plus a <strong>Save now</strong> that
+          ignores both. A save stalls the frame while the <code>.toe</code> is written, so the interval is
+          yours to pick; the dialog shows when the last save landed, or why the last scheduled one was
+          skipped.
+        </p>
+        <p>
+          The settings live on <code>FNS_Autosave</code>'s own parameters inside the project, so the whole
+          feature works from inside TouchDesigner with no launcher running — the launcher's dialog and the
+          palette tabs' <a href="#palette-tabs">session bar</a> edit the same values. The launcher reaches the
+          package through the <a href="#companion">companion</a>, so the session needs both.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="collect">
+        <h2>Collect</h2>
+        <p>
+          The "gather everything before the gig" button. Collect scans the running project for external
+          audio, movie, image and geometry references, copies the files into
+          <code>{project}/collected/&lt;category&gt;/</code>, relinks every reference relative, then saves.
+        </p>
+        <ul>
+          <li><strong>Dry-run first</strong> — the scan plan is a checklist grouped by media type. Untick a row to leave that file and its references alone, or toggle a whole type (video / audio / image / geometry / other) at once.</li>
+          <li><strong>Expression refs</strong> — a reference like <code>app.samplesFolder+'/Map/Banana.tif'</code> is collected by freezing the evaluated file into a constant relative path. Opt out per run, or globally with the Freeze Expression Refs toggle.</li>
+          <li><strong>Never touched</strong> — references already inside the project folder, bind/export-driven parameters, and Embody-managed files. Originals are never moved or deleted.</li>
+        </ul>
+        <p>
+          Collect ships as the <code>FNS_Collect</code> package from the <a href="#fnstools">FNSTools</a>
+          store — not released yet; the FNSTools tab lists it once it is. It works <strong>entirely inside
+          TouchDesigner</strong> — its own panel UI carries Scan, Collect &amp; Save, the freeze toggle, and
+          the clickable scan plan, with no launcher needed — and when TDXLU is running it announces the same
+          actions into the Sessions view. Pair it with
+          the media browser's <strong>Unused</strong> scan to see what you'd be shipping that nothing references.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="fnstools">
+        <h2>FNSTools</h2>
+        <p>
+          The <strong>FNSTools</strong> tab is a store, an installer and a settings editor for the
+          <a href="https://tools.functionstore.xyz" target="_blank" rel="noopener">FNSTools</a> toolkit —
+          the same catalog as <a href="https://tools.functionstore.xyz/get/" target="_blank" rel="noopener">tools.functionstore.xyz/get</a>,
+          without leaving the launcher. Browsing, downloading and installing are free; the Plus packages
+          unlock with a membership — see <a href="#free-pro">Free &amp; FNSTools Plus</a>.
+        </p>
+
+        <h3>Launcher capabilities</h3>
+        <p>
+          Some packages announce their commands to the running session, and TDXLU renders them where they
+          belong — in the Sessions view and its right-click menu. A handful get purpose-built UI rather
+          than a plain button: <code>FNS_Autosave</code> (free) arms the <a href="#autosave">autosave</a>
+          timer, <code>FNS_Collect</code> drives the <a href="#collect">Collect</a> checklist,
+          <code>FNS_MediaBrowser</code> is the <a href="#media-browser">media browser</a>, and
+          <code>FNS_Remote</code> serves the phone, <a href="#touch">multi-touch</a> included.
+          <code>FNS_Collect</code>, <code>FNS_MediaBrowser</code> and <code>FNS_Remote</code> aren't released
+          yet — the tab hides unreleased tools until they are.
+        </p>
+        <p>
+          Each is a complete TouchDesigner tool in its own right — it runs from inside TD with the
+          launcher closed, and its panels are its own. Installing one alongside TDXLU simply lights up the
+          session view as well; the launcher itself ships none of these features, so an install is what
+          adds them, and an uninstall is what takes them away.
+        </p>
+
+        <h3>Catalog</h3>
+        <p>
+          The current release rendered by category, each package with its description, version and docs
+          link. What the target session already has is pre-checked, with <code>✓ 1.1.0</code> and
+          <code>1.1.0 → 1.2.0</code> update badges; a dot marks what's already mirrored on this machine.
+          An <strong>All / Free / Plus</strong> filter and <strong>Select All / None</strong> (plus a
+          checkbox on each category header) act on the rows shown. Plus packages carry a tier badge —
+          <strong>✦ Base</strong> or <strong>✦ Pro</strong> while locked, <strong>✓</strong> once they're
+          yours — and a locked badge opens Function Store's
+          <a href="https://www.patreon.com/function_store/join" target="_blank" rel="noopener">Patreon join page</a>;
+          <strong>Sign in for Plus…</strong> unlocks the ones your membership covers. Tools that aren't
+          released yet don't appear.
+          Tick the tools the project should have, then:
+        </p>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Action</th><th>What happens</th></tr>
+          <tr><td>Install into &lt;session&gt;</td><td>Downloads what's missing (sha256-verified), then drives the toolkit's own installer inside the running session over the <a href="#companion">companion bus</a>, after a <strong>Confirm</strong> step. No toolkit in the project yet? The one-drop bootstrap goes in first. A session without the companion is listed under <em>Needs the companion</em>, with the drag handle instead</td></tr>
+          <tr><td>Download selection for offline use</td><td>Stocks the local store without touching any session — no TouchDesigner needed at all. The store is machine-wide, so TD's own installer reads it later</td></tr>
+          <tr><td>Mirror the whole release</td><td>Download every package in the release locally, for working offline</td></tr>
+          <tr><td>Copy Textport install script</td><td>The one-line paste for a machine or session the launcher can't reach</td></tr>
+          <tr><td>Open store folder</td><td>Show the machine-wide store on disk</td></tr>
+        </table></div>
+        <div class="callout">
+          <strong>The selection is the project's tool set.</strong> Installing makes the project match what
+          you ticked — so anything you <em>untick</em> is removed. The confirm step spells out both the adds
+          and the removals before you commit to it.
+        </div>
+        <div class="callout">
+          <strong>Renamed tools.</strong> When the toolkit renames a package it publishes the new name and
+          retires the old one, with no automatic migration. So installing the new one adds it
+          <em>alongside</em> the copy already in your project, and that older copy quietly stops receiving
+          updates. The confirm step names any such leftovers it finds in the session and tells you to
+          remove them by hand once the new tool works. It deliberately never claims which new package
+          replaced which old one — a release says what was retired, never what took its place.
+        </div>
+
+        <h3>Tool settings</h3>
+        <p>
+          The toolkit's global, per-tool configuration, edited from the launcher:
+        </p>
+        <ul>
+          <li><strong>With a session running</strong> — the launcher talks to the toolkit's own settings service, so you get real parameter metadata: menus, ranges, validated writes that TouchDesigner persists itself. Parameters driven by a bind or an expression are shown but stay read-only.</li>
+          <li><strong>With nothing running</strong> — the config file is edited directly (atomically, with a <code>.bak</code> kept). Tools pick up their section the next time they load.</li>
+        </ul>
+
+        <h3>On the Palette tab</h3>
+        <p>
+          The Palette tab grows an <strong>FNSTools shelf</strong> next to the Toolbox: every package as a
+          standalone component, grouped by category. ◆ means it's on this machine — drag it into a network
+          or place it into a session with <strong>↳</strong>; ◇ downloads on click; ◑ flags a store copy
+          that's gone stale.
+        </p>
+        <p>
+          Tools installed this way can also publish actions to the quick-launch palette — see
+          <a href="#tool-commands">Tool commands</a>. <strong>Settings → Library → FNSTools</strong> sets the
+          release bucket URL, in case you run a mirror or a staging bucket instead of the official one.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="phone">
+        <h2>Phone Remote</h2>
+        <p>
+          One tap on the header's <strong>📱 Phone</strong> button enables LAN access and shows a QR — scan it
+          and the remote opens on your phone (same Wi-Fi, token-gated). Add it to the home screen once and
+          it installs as a standalone app; the pairing survives restarts.
+        </p>
+        <p>
+          The page is your <strong>fleet</strong> remote: every session at once, and what the launcher can
+          do to each — launch, focus, relaunch, kill. Controlling what is <em>inside</em> a project —
+          parameters, multi-touch, save and snapshot — is the
+          <a href="#fnstools">FNS_Remote</a> package's job, and this page links you straight to it per
+          session. FNS_Remote isn't released yet; until it is, sessions show no such link.
+        </p>
+        <ul>
+          <li><strong>Every session is a tab</strong> — live or ended. The open tab shows the session's facts, a heartbeat chip when the watchdog is armed, a live perf readout (fps / cook / drops / GPU / CPU / RAM), and Focus / Relaunch / Kill / Dismiss. Ended sessions relaunch with one tap; <strong>+ Launch</strong> opens any recent project, so the phone is a remote of the whole launcher.</li>
+          <li><strong>Hold-to-confirm</strong> — destructive taps (Kill, and live-session Relaunch) arm on press-and-hold with a filling bar and a haptic buzz; release early to cancel.</li>
+          <li><strong>Straight into a session's own controls</strong> — a session running <a href="#fnstools">FNS_Remote</a> shows <strong>Open remote</strong> on its tab, and the tap lands on that session's own page, served by TouchDesigner itself with its own address and its own code. That is where the exposed parameters, the multi-touch pad and the save / snapshot / record buttons live. A second <strong>Client link</strong> button hands out the reduced page — only the controls that were exposed, nothing else — for an operator or a client.</li>
+          <li><strong>Why the split</strong> — this page is the <em>fleet</em>: the things only the launcher can do to a TouchDesigner <em>process</em>, across every session at once. What happens <em>inside</em> one project belongs to that project, so it keeps working with the launcher closed and a phone always talks to the session it is actually controlling. A session without the package simply shows no link, and says so.</li>
+          <li><strong>Yours to run</strong> — <strong>Settings → Advanced → Control panel server</strong> holds the port (changing it rebinds a running server live), the LAN toggle, and Stop server. <strong>Regenerate code</strong> in the 📱 Phone dialog mints a new code and the previous link stops working.</li>
+        </ul>
+        <p><a href="/demo/control.html">Try the remote in the browser demo →</a></p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="touch">
+        <h2>Phone multi-touch</h2>
+        <p>
+          The phone is also a multi-touch surface for the network — served by the <code>FNS_Remote</code>
+          package from the <a href="#fnstools">FNSTools</a> store (not released yet; the FNSTools tab lists it
+          once it is), which hosts the page from inside TouchDesigner and therefore works with the launcher
+          closed. Install it, drop it into a project,
+          turn <strong>Phone Touch</strong> on, and every finger arrives as CHOP channels — several phones
+          at once:
+        </p>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Output</th><th>Channels / rows</th></tr>
+          <tr><td><code>null_touch</code></td><td><code>t&lt;N&gt;x</code>, <code>t&lt;N&gt;y</code>, <code>t&lt;N&gt;force</code>, <code>t&lt;N&gt;active</code> per touch slot, plus <code>touchcount</code> and <code>clients</code></td></tr>
+          <tr><td><code>table_clients</code></td><td>One row per connected phone: address, screen size, user agent</td></tr>
+        </table></div>
+        <p>
+          Y is flipped by default so 0 is the bottom of the phone screen — matching TD's bottom-up UV
+          convention. Positions are 0–1 unless Normalize is off. Three buttons build the receiving operators
+          for you (Select CHOP, Select DAT, or one receiver COMP holding both), all referencing the
+          <code>op.FNS_REMOTE</code> global shortcut so they keep resolving wherever you drag them.
+          Touch only, by design — motion sensors would drag TLS certificates into a live rig; multi-touch
+          works over plain HTTP everywhere.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="toolbox">
+        <h2>Toolbox</h2>
+        <p>
+          A favorites shelf pinned at the top of the Palette tab, in categories you define. It lives in the
+          launcher config, so it's the same set no matter which palette folders are scanned. A tool is one of:
+        </p>
+        <div class="table-scroll"><table class="doc">
+          <tr><th>Kind</th><th>Source</th><th>Behavior</th></tr>
+          <tr><td>Local</td><td>Any <code>.tox</code> path on disk</td><td>Drag straight into TD; flagged <em>(missing)</em> if the file vanishes</td></tr>
+          <tr><td>URL / GitHub</td><td>Direct <code>.tox</code> URL or <code>owner/repo[#Asset.tox]</code></td><td>Fetched into the cache on pin; ⟳ re-fetches, so a GitHub tool tracks its latest release</td></tr>
+          <tr><td>Package</td><td>pip spec for the configured index</td><td>Install into a running project via From package…</td></tr>
+        </table></div>
+        <p>
+          Pin with <strong>＋ Tool</strong>, from any palette <code>.tox</code>, or just drop a file onto the
+          Toolbox — onto a category row to pin it there. Tools carry an optional label and notes. A
+          <strong>Load .tox into</strong> bar names the running session with the companion and sends the
+          selected component into its network editor; every row also gets a quick <strong>↳</strong> hover
+          action doing the same.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="components">
+        <h2>Components from anywhere</h2>
+        <p>
+          A session card's <strong>Add to project ▾</strong> offers <strong>Local .tox…</strong>,
+          <strong>From URL / GitHub…</strong> and <strong>From package…</strong>; each drops the component
+          into the live network editor through the <a href="#companion">companion</a>.
+        </p>
+        <h3>From URL…</h3>
+        <ul>
+          <li>Any direct <code>.tox</code> URL on any host — object storage, CDN, LAN address; presigned query strings are fine.</li>
+          <li><code>owner/repo</code> or a GitHub URL resolves the <em>latest release</em> asset; add <code>#Asset.tox</code> to pick a specific one.</li>
+          <li>Downloads are cached keyed by URL + filename; redirects followed (10 hops), 512 MiB cap. The URL must contain the <code>.tox</code> in its path — share links that hide the filename aren't resolved yet.</li>
+        </ul>
+        <h3>From package…</h3>
+        <p>
+          Browses a configurable package index (defaults to PyPI with a <code>tdp-</code> name filter — clear
+          it for a small curated index) or takes a custom <code>uv</code> / <code>git+https</code> spec,
+          installs it into the project's <code>.venv</code> — with <code>uv</code> when it's on the machine,
+          otherwise with the env's own pip — resolves the package's ToxFile, and loads it. No
+          <code>.venv</code> next to the <code>.toe</code> yet? From package… sets one up first, and
+          <strong>Set up Python env</strong> on the session card's Companion row does it on its own:
+          TouchDesigner's <code>TDPyEnvManager</code> builds the env in one click (Derivative's disclaimer
+          asks first). The Companion row shows the env's status.
+        </p>
+        <p>Both dialogs remember successful adds and offer them back as clickable Recent entries.</p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="git-backup">
+        <h2>Git &amp; backup</h2>
+        <h3>Git panel</h3>
+        <p>
+          Changes and history, diffs, stage/commit, branch, pull/push. Push and pull use your installed Git
+          and its credentials; an optional GitHub token (<strong>Settings → Accounts → GitHub</strong>)
+          overrides HTTPS auth. Creating a repo seeds a TouchDesigner-aware <code>.gitignore</code>, so
+          <code>Backup/</code>, increments and crash autosaves stay out of the first commit.
+        </p>
+        <h3>Backup panel</h3>
+        <p>
+          Project folder ↔ USB or any synced folder, with include/exclude globs and a max file size.
+          Backup, restore, sync — <strong>no deletes, ever</strong>. Or connect Google Drive, Dropbox,
+          OneDrive or Box directly: a one-time <code>rclone</code> download, sign in via your browser, then
+          the service is a backup destination.
+        </p>
+        <p>
+          <strong>Settings → Backup</strong> holds the root folder, the globs and the size cap, plus
+          <strong>Skip TouchDesigner's Backup/ folders</strong> — off by default, since some people work
+          straight out of those numbered saves. A destination inside the project folder, or one that
+          contains it, is refused.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="heartbeat">
+        <h2>Heartbeat watchdog</h2>
+        <p>
+          A tray watchdog for installations: the companion sends TCP pulses, the launcher listens. On a stall
+          it can relaunch the project automatically and send an SMTP email alert — same on relaunch, so you
+          know the show restarted before anyone calls. Multi-project: watch several sessions at once. Arm it
+          from the session's <strong>Heartbeat</strong> action — offered once the session runs the
+          companion, whose pulse the watchdog listens for — or the Heartbeat panel; the phone remote shows
+          the armed state, last pulse and restart count. Ports, timeouts and email alerts live under
+          <strong>Settings → Monitoring</strong>.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="settings">
+        <h2>Settings &amp; shortcuts</h2>
+        <ul>
+          <li><strong>Settings, paged</strong> — eight pages in a sidebar (General, Keys, Quick Launch, Library, Backup, Accounts, Monitoring, Advanced) with a search box that finds a setting by the name of its control. Every "open Settings" button in the app lands on the section it means.</li>
+          <li><strong>General</strong> — <em>Theme &amp; view</em> (colour theme, gallery or list, <strong>Show the FNSTools tab</strong>); <em>Tray &amp; login</em> (tray icon, close-to-tray, start at login, minimized to the tray); <em>When TDXLU opens</em> (the tab it starts on, or the one it was left on); <em>Opening a project from Finder/Explorer</em> (what to launch a double-clicked <code>.toe</code> with when its exact TD build isn't installed: latest, closest, a pinned build, or always ask); <em>After launching a project</em> (switch to Sessions, hide to the tray, or quit); <em>Updates</em> (the daily check, and versions you skipped); <em>Lists &amp; prompts</em>.</li>
+          <li><strong>Keys</strong> — the in-app shortcuts and the global hotkeys.</li>
+          <li><strong>Rebindable keys</strong> — tab switching, search, the window switcher (<kbd>Alt/⌥+W</kbd>), Settings, Help, launching the startup file (<kbd>Ctrl/⌘+D</kbd>), the view toggles, folder reveal, the README keys, and the panel toggles (unbound by default) are all editable, each with Reset. Template slots stay fixed on <kbd>Ctrl/⌘+1…9</kbd> — one binding per slot.</li>
+          <li><strong>Three global hotkeys</strong> — the main window, Quick Launch, and the main window on the Palette tab; each with its own combo and on/off toggle.</li>
+          <li><strong>Quick Launch</strong> — the five prefix characters, Rank by usage, which tool commands show, favourites, and command presets.</li>
+          <li><strong>Library</strong> — extra palette folders, the package index behind From package…, and the release bucket the <a href="#fnstools">FNSTools</a> store reads from.</li>
+          <li><strong>Accounts</strong> — FNSTools Plus sign-in, the GitHub token, and the Patreon login.</li>
+          <li><strong>Monitoring</strong> — the Heartbeat watchdog, its email alerts, and the Performance stats.</li>
+          <li><strong>Advanced</strong> — the control panel server behind the Phone Remote and the palette tabs, <strong>Migrate settings</strong> (export/import the whole configuration to another machine), and maintenance.</li>
+        </ul>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="displays">
+        <h2>Displays &amp; GPU</h2>
+        <p>
+          For machines driving a show off more than one graphics card. Two separate things, often confused:
+          <strong>GPU affinity</strong> binds a TouchDesigner <em>process</em> to one card, and
+          <strong>window placement</strong> puts that process's windows on the displays attached to it. You
+          want both — a window straying onto another GPU's desktop copies pixels between cards, which is the
+          cost affinity exists to avoid.
+        </p>
+
+        <h3>GPU affinity — set at launch</h3>
+        <p>
+          Right-click a project → <strong>GPU affinity</strong> → pick a monitor. The launcher passes
+          TouchDesigner's own flag when it starts the process
+          (<code>-gpuformonitor</code>, or <code>-gpubusid</code> for an exact card set by hand in the
+          sidecar). Windows only, TouchDesigner 2022.20000 and up — the menu does not appear otherwise, nor
+          on a machine with a single display.
+        </p>
+        <p>
+          It applies on the <em>next</em> launch: a process can only be bound at start. TouchDesigner counts
+          monitors left→right, bottom→top — <strong>not</strong> the order Windows lists them — so confirm a
+          binding took in the Monitors DAT's <code>affinity</code> column.
+        </p>
+
+        <h3>Window placement — set in the session</h3>
+        <p>
+          TouchDesigner has no command-line option for which display a window opens on; placement lives in
+          Window COMP parameters. So the <a href="#companion">companion TOX</a> does it from inside the
+          running session — reading and writing <code>display</code>, justification, offset, size, borders
+          and always-on-top, and opening or closing a window.
+        </p>
+        <p>
+          Save the current arrangement into the sidecar and the companion restores it shortly after the
+          project loads, once TouchDesigner's own startup Window Placement has run. A layout can be kept on
+          file without being restored (<code>apply_on_load: false</code>). Placement parameters driven by an
+          expression are never overwritten — they are reported back as locked instead. Saves cover
+          project-level windows only: a loaded palette contributes dozens of internal popup windows that
+          nobody wants in a sidecar.
+        </p>
+      </section>
+
+      <!-- ───────────────────────────────────────────── -->
+      <section id="free-pro">
+        <h2>Free &amp; FNSTools Plus</h2>
+        <p>
+          Every feature of the launcher is free, with no account and no licence key: launching with build
+          detection, versions, tags, the quick-launch palette, the palette browser and Toolbox, session
+          control, companion basics (save, thumbnail, preview video), the fleet Phone Remote, window management and
+          the performance readout, loading components from disk, URLs and packages, Patreon import, git,
+          backup, the Heartbeat watchdog, multi-GPU display control, and the FNSTools store and installer —
+          including the Sessions-view hooks for the <a href="#fnstools">launcher capabilities</a> its
+          packages add. The packages themselves are free or Plus, as their badges say.
+        </p>
+        <p>
+          What a membership pays for is the <strong>FNSTools Plus</strong> packages: the tools on the
+          FNSTools tab that carry a tier badge. Each one unlocks at the tier its badge names —
+          <strong>Base</strong> or <strong>Pro</strong> — on Function Store's
+          <a href="https://www.patreon.com/function_store/join" target="_blank" rel="noopener">Patreon</a>.
+          <code>FNS_Autosave</code> is free. <code>FNS_Collect</code>, <code>FNS_MediaBrowser</code> and
+          <code>FNS_Remote</code> — the package that controls what is <em>inside</em> a running project from
+          a phone — aren't released yet. The launcher links you to these packages; it does not ship them.
+        </p>
+        <p>
+          Sign in once per machine from <strong>Settings → Accounts → FNSTools Plus</strong> or with
+          <strong>Sign in for Plus…</strong> on the FNSTools tab, then install the packages from the FNSTools
+          tab. Cancelling never locks anything already in your projects.
+        </p>
+      </section>
+
+    </article>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap footer-inner">
+    <div>© 2026 TDX Launcher Ultra · Built for TouchDesigner</div>
+    <div class="footer-links">
+      <a href="/docs/">Docs</a>
+      <a href="/demo/">Demo</a>
+      <a href="https://derivative.ca" target="_blank" rel="noopener">TouchDesigner</a>
+      <a href="https://patreon.com/function_store" target="_blank" rel="noopener">Patreon</a>
+      <a href="https://functionstore.xyz" target="_blank" rel="noopener">Function Store</a>
+      <a href="mailto:dan%2Btdxlu@functionstore.xyz?subject=TDX%20Launcher%20Ultra%20feedback">Feedback</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/site-nav.js" defer></script>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script src="/_vercel/insights/script.js" defer></script>
+
+</body>
+</html>

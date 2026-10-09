@@ -1,0 +1,118 @@
+[package]
+name = "tdxlu"
+version = "0.22.3"
+description = "TDXLU (TDX Launcher Ultra) - TouchDesigner project launcher"
+authors = ["Function Store"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[features]
+# Ship-time toggles. `default` is what a plain `cargo build` / `tauri build`
+# includes.
+default = ["patreon", "licensing"]
+# Cookie-based Patreon component import (unofficial web API). Remove from
+# `default` to build without it: the UI hides itself (get_app_info reports
+# patreon_enabled=false) and all networking code is excluded from the binary.
+# Disable at build time without editing this file:
+#   cargo tauri build --no-default-features
+patreon = []
+# Patreon-membership activation gate + 14-day trial (licensing.rs). With the
+# feature off, license_status reports activated=true (provider "disabled") and
+# the frontend never shows the gate — an unlicensed build fails open, same as
+# TDMap's `_licensing_configured()` rule.
+licensing = []
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.11.3", features = ["tray-icon", "protocol-asset", "image-png"] }
+http = "1"
+tauri-plugin-log = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+dirs = "6"
+chrono = { version = "0.4", features = ["clock"] }
+regex = "1"
+thiserror = "2"
+anyhow = "1"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls", "json"] }
+base64 = "0.22"
+# SHA-256 verification of utility TOX downloads (see updates.rs).
+sha2 = "0.10"
+# Verifying the gate's Ed25519 entitlement claims (see licensing.rs). The
+# launcher holds only the PUBLIC key; verifying mints nothing.
+ed25519-dalek = "2"
+lettre = { version = "0.11", default-features = false, features = [
+  "builder",
+  "hostname",
+  "smtp-transport",
+  "rustls-tls",
+] }
+tauri-plugin-drag = "2.1.1"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+tauri-plugin-autostart = "2"
+toml = "0.8"
+# Browser control panel server (control_server.rs): std-thread HTTP, no async runtime.
+tiny_http = "0.12"
+# Phone multi-touch relay (touch_relay.rs). tiny_http hands over the raw socket
+# after we answer the handshake ourselves, so we need only the frame codec --
+# no TLS, no handshake parser, no async runtime.
+tungstenite = { version = "0.24", default-features = false }
+# SHA-1 is required by the WebSocket handshake (RFC 6455 accept key). Not a
+# security choice: the spec mandates it. Real hashing elsewhere uses sha2.
+sha1 = "0.10"
+# Per-PID CPU/RAM sampling for the Current tab's performance readout.
+sysinfo = { version = "0.33", default-features = false, features = ["system"] }
+uuid = { version = "1", features = ["v4"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+# Pinned: newer trash releases require rustc >= 1.85, above this crate's MSRV.
+trash = "=5.2.3"
+
+[target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
+tauri-plugin-single-instance = "2"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"
+# Per-window enumeration/focus for running TD sessions (see session_windows.rs).
+windows-sys = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Gdi",
+  "Win32_System_Threading",
+  "Win32_UI_WindowsAndMessaging",
+  # SHQueryUserNotificationState — "is the user in a full-screen experience?"
+  "Win32_UI_Shell",
+] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+plist = "1"
+# Cmd+Tab activation watch (see lib.rs watch_app_activation) - AppKit sends no
+# Apple Event for it, so the only signal is the NSApplication notification.
+# NSWorkspace + NSRunningApplication: the quick-launch summon reads the
+# frontmost app's pid (session_windows::foreground_pid) natively — an
+# osascript spawn would cost the very latency the summon path avoids.
+objc2-app-kit = { version = "0.3", default-features = false, features = [
+  "std",
+  "NSApplication",
+  "NSWorkspace",
+  "NSRunningApplication",
+  "libc", # gates NSRunningApplication::processIdentifier
+] }
+objc2-foundation = { version = "0.3", default-features = false, features = [
+  "std",
+  "NSNotification",
+  "NSOperation",
+  "NSString",
+  "block2",
+] }
+block2 = "0.6"

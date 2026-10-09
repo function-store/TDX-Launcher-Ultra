@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Merged into the generated Info.plist by the macOS bundler. Points at
+	     the AppIcon in Resources/Assets.car, which is what lets macOS 26 draw
+	     the light, dark and tinted renderings; CFBundleIconFile (icon.icns)
+	     stays as the single-appearance fallback. -->
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
+	<!-- The bundler writes CFBundleDocumentTypes from bundle.fileAssociations,
+	     but has no way to name a document icon, so Finder falls back to
+	     shrinking the app icon onto its page template — which puts the icon's
+	     own background (blue in light mode) on the paper. Redeclaring the type
+	     here overrides that whole key with the same association plus
+	     CFBundleTypeIconFile; keep it in step with fileAssociations in
+	     tauri.conf.json, which still drives Windows and Linux.
+
+	     The claim has to name the UTI, not just the extension: Finder resolves a
+	     document icon through the file's content type, and an extension-only
+	     claim never gets consulted (verified — it falls back to the composite).
+	     ca.derivative.toe belongs to TouchDesigner, so we import it rather than
+	     export it, which also keeps .toe files typed when TD is not installed. -->
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>toe</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>ca.derivative.toe</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>TouchDesigner Project</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>toe-document</string>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>ca.derivative.toe</string>
+			<key>UTTypeDescription</key>
+			<string>TouchDesigner Environment File</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.audiovisual-content</string>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>toe</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<!-- Without this key macOS SILENTLY denies the app's osascript / System
+	     Events calls (no prompt, no error surfaced) — and with them the
+	     window-title read that tracks TouchDesigner's Increment-and-Save
+	     renames (open_projects.rs titles_by_pid). Dev runs never hit this
+	     because they inherit the terminal's Automation permission; only
+	     installed builds were affected. With the key present, macOS shows
+	     the one-time "wants to control System Events" consent prompt. -->
+	<key>NSAppleEventsUsageDescription</key>
+	<string>TDX Launcher Ultra reads TouchDesigner window titles to keep track of which project file each session currently has open.</string>
+</dict>
+</plist>

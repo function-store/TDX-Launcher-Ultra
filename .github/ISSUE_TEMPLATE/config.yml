@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://launcher.functionstore.tools/docs/
+    about: How every feature works — worth a look before filing.
+  - name: Download
+    url: https://launcher.functionstore.tools/#download
+    about: The latest installers for Windows and macOS.

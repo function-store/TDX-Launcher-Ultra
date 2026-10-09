@@ -1,0 +1,196 @@
+/* -- First-encounter hints ----------------------------------------------------
+   Non-blocking: no backdrop, nothing captures clicks except the bubble itself,
+   so the user can keep working while a tip is up. Sits under the tour (900+)
+   but above modals (50). */
+
+.hint-ring {
+  position: fixed;
+  z-index: 700;
+  border-radius: calc(var(--radius) + 3px);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+  pointer-events: none;
+  animation: hint-ring-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+@keyframes hint-ring-in {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hint-bubble {
+  position: fixed;
+  z-index: 701;
+  width: 268px;
+  max-width: calc(100vw - 24px);
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent-btn-border);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  padding: 9px 12px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: hint-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+
+/* Measured off-screen on the first frame, before the anchor is located. */
+.hint-bubble--hidden {
+  opacity: 0;
+  left: -9999px;
+  top: -9999px;
+  pointer-events: none;
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hint-bubble--top {
+  animation-name: hint-in-up;
+}
+
+@keyframes hint-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hint-beak {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--accent-btn-border);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.hint-beak--bottom {
+  border-bottom: none;
+  border-right: none;
+}
+.hint-beak--top {
+  border-top: none;
+  border-left: none;
+}
+.hint-beak--right {
+  border-top: none;
+  border-right: none;
+}
+.hint-beak--left {
+  border-bottom: none;
+  border-left: none;
+}
+
+.hint-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint-kicker {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.hint-x {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.hint-x:hover:not(:disabled) {
+  background: none;
+  border: none;
+  color: var(--text);
+}
+
+.hint-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+  margin-top: -3px;
+}
+
+.hint-body {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.hint-body b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.hint-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.hint-off {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+
+.hint-off:hover:not(:disabled) {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  text-decoration: underline;
+}
+
+.hint-ok {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 12px;
+  background: var(--accent-btn);
+  border-color: var(--accent-btn-border);
+  color: var(--accent);
+}
+
+.hint-ok:hover:not(:disabled) {
+  background: var(--accent-btn-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-ring,
+  .hint-bubble {
+    animation: none;
+  }
+}

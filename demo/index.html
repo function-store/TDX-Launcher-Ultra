@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="./icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TDXLU — browser demo</title>
+    <meta
+      name="description"
+      content="Click-through browser demo of TDXLU, the TouchDesigner project launcher. The real UI running on mock data — nothing touches your machine."
+    />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <div id="demo-banner">
+      <span class="demo-badge">Demo</span>
+      <span class="demo-note">
+        This is the real TDXLU UI running in your browser on <strong>mock data</strong> — projects, sessions,
+        git history and Patreon posts here are all fake, and nothing touches your machine.<span class="demo-note-extra">
+        Launching, killing, committing and collecting are simulated so you can feel the workflow.</span>
+      </span>
+      <a class="demo-alt" href="./quick.html">Quick Launch →</a>
+      <a class="demo-alt" href="./control.html">Phone remote →</a>
+      <a href="../#download">Download the real app →</a>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+    <!-- Vercel Web Analytics, same as the landing page. The src stays absolute
+         even though this build's base is relative: the platform serves the
+         route from the domain root, not from /demo/. Demo-only — the desktop
+         app builds from the root index.html, which has no analytics. -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script src="/_vercel/insights/script.js" defer></script>
+  </body>
+</html>

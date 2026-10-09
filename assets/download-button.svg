@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="76" viewBox="0 0 440 76" role="img" aria-label="Download TDX Launcher Ultra">
+  <rect x="1" y="1" width="438" height="74" rx="12" fill="#1e4a1e" stroke="#32ff00" stroke-width="2"/>
+  <g fill="none" stroke="#c8ffc8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 22v24"/>
+    <path d="M34 37l10 10 10-10"/>
+    <path d="M32 54h24"/>
+  </g>
+  <text x="76" y="36" fill="#c8ffc8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" font-weight="700">Download TDX Launcher Ultra</text>
+  <text x="76" y="58" fill="#8fd88f" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14">Windows · macOS · free, no account</text>
+</svg>

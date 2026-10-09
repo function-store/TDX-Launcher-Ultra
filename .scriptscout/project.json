@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hidden": [],
+  "preferredPort": null,
+  "env": {},
+  "python": null,
+  "node": null,
+  "ignore": [],
+  "runGroups": [],
+  "comments": {},
+  "arguments": {},
+  "variants": [],
+  "loadEnv": true
+}

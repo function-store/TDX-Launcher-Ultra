@@ -1,0 +1,25 @@
+
+# Embody / Envoy -- normalize TD line endings (auto-managed)
+*.py text eol=lf
+*.md text eol=lf
+*.tdn text eol=lf diff=tdn
+*.json text eol=lf
+*.tsv text eol=lf
+*.xml text eol=lf
+*.toe binary
+*.tox binary
+
+# The TDXLPP.toe dev project and what only it uses: Embody's tracking table,
+# the utility's .tdn exports, root-level demo/helper COMPs and the project's
+# launcher sidecar. Tracked here, left out of `git archive` (the public
+# snapshot). TDXLU_dev.tox is the utility's portable dev artifact instead.
+/utility/TDXLPP.toe export-ignore
+/utility/TDXLPP.tdxlpp.json export-ignore
+/utility/TDXLPP_icon.png export-ignore
+/utility/TDPyEnvManagerContext.yaml export-ignore
+/utility/externalizations.tsv export-ignore
+/utility/TDXLauncherUtility.tdn export-ignore
+/utility/TDXLauncherUtility/TDXLUHeartbeat.tdn export-ignore
+/utility/CmdDemo/** export-ignore
+/utility/utils/** export-ignore
+/utility/Embody/** export-ignore
